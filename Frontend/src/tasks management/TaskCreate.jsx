@@ -1,13 +1,23 @@
-import { set, useForm } from "react-hook-form";
+import { get, set, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import React, { use, useState, useEffect } from "react";
 import { createTask } from "../api/task.api";
-import { showProjects } from "../api/project.api";
-import { getDepartmentEmployees } from "../api/user.api";
+import {  showProjects } from "../api/project.api";
+import { useParams } from "react-router-dom";
+import { updateTask } from "../api/task.api";
+import { getTask } from "../api/task.api";
+import { useUser } from "../context/UserContext";
+import { getTeamLeaderProjects } from "../api/project.api";
+import { getAsscociatedEmployees } from "../api/project.api";
+
 
 const TaskCreate = () => {
   const [project, setProject] = useState();
   const [employee, setEmployee] = useState();
+  const [edit, setEdit] = useState(false);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const {user} = useUser();
 
   const {
     register,
@@ -18,45 +28,109 @@ const TaskCreate = () => {
   } = useForm();
 
   useEffect(() => {
+    if(user?.role_id===1){
     showProjects()
       .then((res) => {
         setProject(res.data.projects);
+        AssociatedEmployees(res.data.projects[0].id);
       })
       .catch((err) => {
+        if(err.response.status == "404"){
+          console.log(err.response.data.message);
+          navigate("/tasks");
+        }
         console.log(err);
       });
+    }
+    
+    else if(user?.role_id===2){
 
-    getDepartmentEmployees()
-      .then((res) => {
-        console.log(res.data.employees);
-        setEmployee(res.data.employees);
+      getTeamLeaderProjects()
+      .then((response)=>{
+        setProject(response.data.projects);
+        AssociatedEmployees(response.data.projects[0].id);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error)=>{
+        console.log(error);
       });
+    }
+
+          
+
+    if (id) {
+      setEdit(true);
+      getTask(Number(id))
+        .then((response) => {
+          console.log(response.data.task);
+          
+          AssociatedEmployees(response.data.task.project_id).then(() => {
+           reset(response.data.task);
+         });
+
+        })
+        .catch((error) => {
+          alert("Error fetching task details: " + error.response.data.message);
+          navigate("/tasks");
+        });
+    }
   }, []);
 
-  function onsubmit(data) {
-    const trimmedData = {
-      project_id: data.project_id.trim(),
-      title: data.title.trim(),
-      description: data.description.trim(),
-      assigned_to: data.assigned_to.trim(),
-      status: data.status.trim(),
-      priority: data.priority.trim(),
-      due_date: data.due_date.trim(),
-    };
 
-    createTask(trimmedData)
-      .then((response) => {
-        console.log(response);
-        alert(response.data.message);
-        reset();
-      })
-      .catch((error) => {
-        console.log(error);
-        alert("Error creating task: " + error.response.data.message);
-      });
+  //this includes team leader and all employees of the department
+
+    function AssociatedEmployees(id) {
+      return getAsscociatedEmployees(id)
+        .then((response) => {
+          setEmployee(response.data.employees);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+
+  function onsubmit(data) {
+    if (edit) {
+      const trimmedData = {
+        id: Number(id),
+        project_id: data.project_id,
+        title: data.title,
+        description: data.description,
+        assigned_to: data.assigned_to,
+        status: data.status,
+        priority: data.priority,
+        due_date: data.due_date,
+      };
+      updateTask(trimmedData)
+        .then((response) => {
+          console.log(response);
+          alert(response.data.message);
+          navigate("/tasks");
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Error updating task: " + error.response.data.message);
+        });
+    } else {
+      const trimmedData = {
+        project_id: data.project_id.trim(),
+        title: data.title.trim(),
+        description: data.description.trim(),
+        assigned_to: data.assigned_to.trim(),
+        status: data.status.trim(),
+        priority: data.priority.trim(),
+        due_date: data.due_date.trim(),
+      };
+      createTask(trimmedData)
+        .then((response) => {
+          console.log(response);
+          alert(response.data.message);
+          reset();
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Error creating task: " + error.response.data.message);
+        });
+    }
   }
 
   return (
@@ -64,8 +138,14 @@ const TaskCreate = () => {
       <form onSubmit={handleSubmit(onsubmit)}>
         <label>
           Select Project
-          <select {...register("project_id", { required:{ value:true, message: "Project is required" } })}>
-            <option value="">Projects</option>
+          <select 
+            {...register("project_id", {
+              required: { value: true, message: "Project is required" },
+              
+            })}
+            onChange = {(e)=>AssociatedEmployees(e.target.value)}
+          >
+            <option value="">Select Project</option>
             {project?.map((proj) => (
               <option key={proj.id} value={proj.id}>
                 {proj.name}
@@ -103,11 +183,18 @@ const TaskCreate = () => {
 
         <label>
           Employees
-          <select {...register("assigned_to", { required: { value: true, message: "Employee needs to be assigned" } })}>
+          <select
+            {...register("assigned_to", {
+              required: {
+                value: true,
+                message: "Employee needs to be assigned",
+              },
+            })}
+          >
             <option value="">Employees</option>
             {employee?.map((emp) => (
               <option key={emp.id} value={emp.id}>
-                {emp.name}
+               {emp.role_id === 2 ? `${emp.name} (Team Leader)` : emp.name}
               </option>
             ))}
           </select>
@@ -115,7 +202,11 @@ const TaskCreate = () => {
         </label>
         <label>
           Status
-          <select {...register("status", { required: { value: true, message: "Status is required" } })}>
+          <select
+            {...register("status", {
+              required: { value: true, message: "Status is required" },
+            })}
+          >
             <option value="pending">Pending</option>
             <option value="active">Active</option>
             <option value="completed">Completed</option>
@@ -125,7 +216,11 @@ const TaskCreate = () => {
 
         <label>
           Priority
-          <select {...register("priority", { required: { value: true, message: "Priority is required" } })}>
+          <select
+            {...register("priority", {
+              required: { value: true, message: "Priority is required" },
+            })}
+          >
             <option value="low">Low</option>
             <option value="medium">Medium</option>
             <option value="high">High</option>
@@ -135,11 +230,16 @@ const TaskCreate = () => {
 
         <label>
           Deadline
-          <input type="date" {...register("due_date", { required: { value: true, message: "Deadline is required" } })} />
+          <input
+            type="date"
+            {...register("due_date", {
+              required: { value: true, message: "Deadline is required" },
+            })}
+          />
           {errors.due_date && <p>{errors.due_date.message}</p>}
         </label>
 
-        <button type="submit">Create Task</button>
+        <button type="submit">{edit ? "Update Task" : "Create Task"}</button>
       </form>
     </div>
   );

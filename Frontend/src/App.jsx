@@ -13,7 +13,8 @@ import ProjectView from "./department head/ProjectView";
 import TaskRoute from "./tasks management/TaskRoute";
 import TaskList from "./tasks management/TaskList";
 import TaskCreate from "./tasks management/TaskCreate";
-import ProtectedRoute from "./layouts/ProtectedRoute";
+
+import LeadDashboard from "./tasks management/LeadDashboard";
 
 function App() {
   const router = createBrowserRouter([
@@ -91,7 +92,25 @@ function App() {
       element: <TaskRoute />,
       children: [
         {
+          path: "/lead/dashboard",
+          element: (
+            <>
+              <Navbar />
+              <LeadDashboard />
+            </>
+          ),
+        },
+        {
           path: "/tasks",
+          element: (
+            <>
+              <Navbar />
+              <TaskList />
+            </>
+          ),
+        },
+        {
+          path: "/tasks/:id",
           element: (
             <>
               <Navbar />
@@ -108,6 +127,15 @@ function App() {
             </>
           ),
         },
+        {
+          path: "/tasks/edit/:id",
+          element: (
+            <>
+              <Navbar />
+              <TaskCreate />
+            </>
+          ),
+        }
       ],
     },
   ]);

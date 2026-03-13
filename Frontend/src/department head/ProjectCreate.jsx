@@ -31,7 +31,13 @@ const ProjectCreate = () => {
           setTeam_Leads(response.data.team_leads);
         })
         .catch((error)=>{
-
+          if(error.response.status === "404"){
+            console.log(error.response.data.message);
+            setTeam_Leads([]);
+          }
+          else{
+            console.log(error);
+          }
         })
 
 
@@ -98,7 +104,7 @@ const ProjectCreate = () => {
           navigate(`//head/projects/view/${id}`);
         })
         .catch((error) => {
-          console.log(error);
+          console.log(error.response.data);
           alert("Failed to update the project");
         });
     }
@@ -125,6 +131,7 @@ const ProjectCreate = () => {
         </label>
         {errors.name && <p>{errors.name.message}</p>}
         <label>
+          Project Description
           <textarea
             placeholder="Project Description"
             {...register("description", {
@@ -159,7 +166,7 @@ const ProjectCreate = () => {
               required: "Team Leader is required",
             })}
           >
-            <option value="">Select Team Leader</option>
+            <option value="">{team_leads?.length==0 ? "No Team Lead Available" :"Select Team Leader"}</option>
             {team_leads?.map((lead) => (
               <option key={lead.id} value={lead.id}>
                 {lead.name}

@@ -11,7 +11,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const {user} = useUser();
 
-
   function handleLogout() {
     logoutUser()
       .then((response) => {
@@ -30,9 +29,27 @@ const Navbar = () => {
     <div >
       <p>Task Management System</p>
       <p>{user?.department}</p>
+      <p>{user?.name}</p>
+
+      {/* head navbar */}
+
+      {user && user.role_id==1 &&  (
+      <> 
+      <Link to="/head/dashboard">Dashboard</Link>
       <Link to="/head/projects">Projects</Link>
       <Link to="/tasks">Tasks</Link>
       <Link>Employees</Link>
+      </>
+      )}
+
+      {user && user.role_id==2 &&  (
+      <> 
+      <Link to="/lead/dashboard">Dashboard</Link>
+      <Link to="/tasks">Tasks</Link>
+      </>
+      )}
+
+
       <button onClick={handleLogout}>Logout</button>
     </div>
   )

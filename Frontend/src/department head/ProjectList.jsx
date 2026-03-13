@@ -29,16 +29,19 @@ const ProjectList = () => {
 
 
 
-  return (
+ return (
+  <div>
     <div>
-      <div>
-        <h1>Project List</h1>
-        {data.map(
-          (
-            project, //card component containing few project details
-          ) => (
+      {data.length === 0 ? (
+        <p>No Projects Found</p>
+      ) : (
+        <>
+          <h1>Project List</h1>
+
+          {data.map((project) => (
             <div key={project.id}>
               <h3>Name: {project.name}</h3>
+
               <p>
                 {new Date(project.start_date + "T00:00:00").toLocaleDateString(
                   "en-GB",
@@ -46,7 +49,7 @@ const ProjectList = () => {
                     day: "numeric",
                     month: "long",
                     year: "numeric",
-                  },
+                  }
                 )}
               </p>
 
@@ -57,21 +60,22 @@ const ProjectList = () => {
                     day: "numeric",
                     month: "long",
                     year: "numeric",
-                  },
+                  }
                 )}
               </p>
-              <button onClick={()=>{handleView(project.id)}}>View</button>
+
+              <button onClick={() => handleView(project.id)}>View</button>
             </div>
-          ),
-        )}
-      </div>
-
-        <br></br> 
-        {/* remove br */}
-
-      <button onClick={handleCreate}>Create Project</button>
+          ))}
+        </>
+      )}
     </div>
-  );
-};
+
+    <br />
+
+    <button onClick={handleCreate}>Create Project</button>
+  </div>
+);
+}
 
 export default ProjectList;

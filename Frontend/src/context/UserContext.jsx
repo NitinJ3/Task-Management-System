@@ -5,19 +5,17 @@ const UserContext = createContext(null);
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [authtoken,setAuthToken] = useState(null);
+
 
   useEffect(() => { 
 
     if(localStorage.getItem('token')){
-      setAuthToken(localStorage.getItem('token'));
       getUser()
       .then((response)=>{
         setUser(response.data.user);
       })
       .catch((error)=>{
         console.log(error);
-        setAuthToken(null);
         setUser(null);
       })
     }
@@ -25,7 +23,7 @@ export const UserProvider = ({ children }) => {
   },[])
 
   return (
-    <UserContext.Provider value={{ user, setUser, authtoken }}>
+    <UserContext.Provider value={{ user, setUser}}>
       {children}
     </UserContext.Provider>
   );
@@ -35,8 +33,3 @@ export const useUser = () => useContext(UserContext);
 
 //wraping useContext hook in a function because hooks can only be run inside a jsx component
 //to avoid calling it right now 
-
-  
-
-
-

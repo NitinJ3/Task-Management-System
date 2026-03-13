@@ -19,8 +19,19 @@ class Project extends Model
 
     public $timestamps = false;
 
+    //team leader user
     public function user()
     {
         return $this->belongsTo(User::class, 'team_leader');
+    }
+    public function creator(){
+
+        return $this->belongsTo(User::class, 'created_by');
+
+    }
+
+    public function tasks(){
+        return $this->hasMany(Task::class);
+
     }
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { getUser } from "../api/user.api";
-
+import { useUser } from "../context/UserContext";
 
 
 const HeadRoute = () => {
@@ -9,32 +9,24 @@ const HeadRoute = () => {
   
   const navigate = useNavigate();
   const [auth, setAuth] = useState(false);
-
+  const {user} = useUser();
      
 
   useEffect(() => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      navigate("/login");
+      navigate("/");
     }
-
-    getUser()
-      .then((response) => {
-        console.log(response.data.user);
-        if (!(response.data.user.role_id === 1)) {
-          navigate("/");
-        } else {
-          setAuth(true);
-        }
-
-       
-      })
-      .catch((error) => {
-        console.log(error);
-        navigate("/login");
-      });
-  }, []);
+    if (user) {
+      if (user.role_id === 1) {
+        setAuth(true);
+        console.log(user);
+      } else {
+        navigate("/");
+      }
+    }
+  }, [user]);
 
   return (
     <>

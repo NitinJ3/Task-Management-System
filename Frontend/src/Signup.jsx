@@ -40,7 +40,9 @@ const Signup = () => {
   return (
     <div>
       <p>Create Account</p>
+      
       <form onSubmit={handleSubmit(onSubmit)}>
+
         <label>
           Name:
           <input

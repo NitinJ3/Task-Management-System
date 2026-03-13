@@ -29,7 +29,9 @@ const Login = () => {
         localStorage.setItem("token",response.data.token);
         setUser(response.data.user);
                 if(response.data.user.role_id === 1){
-                navigate("/head/dashboard");
+                navigate("/head/dashboard");}
+                else if(response.data.user.role_id === 2){
+                    navigate("/lead/dashboard");
                 }else{
                     navigate("/");
                 }
