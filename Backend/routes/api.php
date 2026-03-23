@@ -31,6 +31,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::delete("/head/projects/delete/{id}", [ProjectController::class, 'deleteProject']);
         Route::get("/head/users/teamleads", [UserController::class, 'getDepartmentTeamLeads']);
+
+        Route::get("/user/employee/{id}",[UserController::class,'getUserById']);
+        Route::patch("/user/employee/update",[UserController::class,'updateUser']);
     });
 
     Route::middleware('role:1,2')->group(function () {

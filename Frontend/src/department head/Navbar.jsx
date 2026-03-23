@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
 import { logoutUser } from '../api/auth.api';
 import { useUser } from "../context/UserContext";
+import { Outlet } from 'react-router-dom';
 
 //this will be a common navbar for all users, currently its for department head
 
@@ -38,7 +39,7 @@ const Navbar = () => {
       <Link to="/head/dashboard">Dashboard</Link>
       <Link to="/head/projects">Projects</Link>
       <Link to="/tasks">Tasks</Link>
-      <Link>Employees</Link>
+      <Link to="/head/users">Employees</Link>
       </>
       )}
 
@@ -51,6 +52,7 @@ const Navbar = () => {
 
 
       <button onClick={handleLogout}>Logout</button>
+      <Outlet />
     </div>
   )
 }

@@ -168,7 +168,7 @@ class ProjectController extends Controller
 
         $projects = Project::where('team_leader', Auth::id())->get();
 
-        if (!$projects) {
+        if ($projects->isEmpty()) {
             return response()->json([
                 "message" => "No projects found"
             ], 404);

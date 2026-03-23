@@ -14,7 +14,7 @@ const Signup = () => {
     formState: { errors },
   } = useForm();
 
-  function onSubmit(data) {
+  async function onSubmit(data) {
     let trimmedData = {
       name: data.name.trim(),
       email: data.email.trim(),
@@ -22,27 +22,25 @@ const Signup = () => {
     };
 
     //register user
-    registerUser(trimmedData)
-      .then((response) => {
-        console.log(response.data.message);
-        alert("Registration succesfull");
-        navigate("/login");
-      })
-      .catch((error) => {
-        if (error.response?.status === 422) {
-          alert(error.response.data.errors);
-        } else {
-          console.log(error);
-        }
-      });
+    try {
+      const response = await registerUser(trimmedData);
+      console.log(response.data.message);
+      alert("Registration succesfull");
+      navigate("/login");
+    } catch (error) {
+      if (error.response?.status === 422) {
+        alert(error.response.data.errors);
+      } else {
+        console.log(error);
+      }
+    }
   }
 
   return (
     <div>
       <p>Create Account</p>
-      
-      <form onSubmit={handleSubmit(onSubmit)}>
 
+      <form onSubmit={handleSubmit(onSubmit)}>
         <label>
           Name:
           <input
@@ -66,7 +64,7 @@ const Signup = () => {
           <input
             type="email"
             {...register("email", {
-              required: { value: true, message: "Email is required" }
+              required: { value: true, message: "Email is required" },
             })}
           />
         </label>
@@ -85,7 +83,7 @@ const Signup = () => {
           />
         </label>
         {errors.password && <p>{errors.password.message}</p>}
-        <input type="submit" value={"Sign Up"}/>
+        <input type="submit" value={"Sign Up"} />
         <p>
           Already have an account <a href="/login">Login</a>
         </p>

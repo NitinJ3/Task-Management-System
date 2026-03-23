@@ -5,43 +5,42 @@ import { loginUser } from "./api/auth.api";
 import { useUser } from "./context/UserContext";
 
 const Login = () => {
-    const [error,setError] = useState(null);
-    const navigate = useNavigate();
-    const {user,setUser} = useUser();
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const { user, setUser } = useUser();
 
-    const {
-        register,
-        handleSubmit,
-        watch,
-        reset,
-        formState: { errors },
-      } = useForm();
-    
-   function onSubmit(data){
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm();
+
+  function onSubmit(data) {
     let trimmedData = {
-        email: data.email.trim(),
-        password: data.password.trim(),
+      email: data.email.trim(),
+      password: data.password.trim(),
     };
 
-    loginUser(trimmedData)
-    .then((response)=>{
+    return loginUser(trimmedData)
+      .then((response) => {
         console.log(response.data.message);
-        localStorage.setItem("token",response.data.token);
+        localStorage.setItem("token", response.data.token);
         setUser(response.data.user);
-                if(response.data.user.role_id === 1){
-                navigate("/head/dashboard");}
-                else if(response.data.user.role_id === 2){
-                    navigate("/lead/dashboard");
-                }else{
-                    navigate("/");
-                }
-    })
-    .catch((error)=>{
+        if (response.data.user.role_id === 1) {
+          navigate("/head/dashboard");
+        } else if (response.data.user.role_id === 2) {
+          navigate("/lead/dashboard");
+        } else {
+          navigate("/");
+        }
+      })
+      .catch((error) => {
         console.log(error);
         setError(error.response.data.message);
-    })
-
-   }
+      });
+  }
 
   return (
     <div>
@@ -62,13 +61,18 @@ const Login = () => {
           />
         </label>
         {errors.password && <p>{errors.password.message}</p>}
-        <input type="submit" value={"Login"}/>
-        <p>Dont have an account <a href="/signup">Sign up</a></p>
+        <input
+          type="submit"
+          value={isSubmitting ? "Logging in..." : "Login"}
+          disabled={isSubmitting}
+        />
+        <p>
+          Dont have an account <a href="/signup">Sign up</a>
+        </p>
       </form>
-        {error && <p>{error}</p>}
-
+      {error && <p>{error}</p>}
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

@@ -6,9 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Role;
 
 class UserController extends Controller
-{
+{   
+
     public function registerUser(Request $request)
     {
 
@@ -90,18 +92,66 @@ class UserController extends Controller
     function getDepartmentEmployees()
     {
 
-        $employees = User::where("department", Auth::user()->department)
+        $employees = User::with("role")
+            ->where("department", Auth::user()->department)
             ->where("role_id", "!=", 1)
             ->get();
+        
 
-        if (!$employees) {
+        if (!$employees || $employees->isEmpty()) {
             return response()->json([
                 "message" => "failed to fetch department employees"
-            ]);
+            ], 404);
         }
         return response()->json([
             "message" => "employees fetched",
             "employees" => $employees
         ]);
+    }
+
+
+    function getUserById($id){
+        $user = User::find($id);
+        if(!$user){
+            return response()->json([
+                "message" => "failed to fetch the employee user"
+            ], 404);
+        }
+
+
+            return response()->json([
+                "user"=>$user
+            ]);
+
+    }
+
+    function updateUser(Request $request){
+        $user = User::find($request->id);
+
+         if(!$user){
+            return response()->json([
+                "message"=>"User doesnt exist"
+            ],404);
+        }
+
+        if($user->department!=Auth::user()->department){
+            return response()->json([
+                "message"=>"You are trying to update a user not in your department"
+            ],403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+            'is_active' => 'required|numeric|in:0,1',
+            'role_id' => 'required|numeric|in:1,2,3',
+        ]);
+
+        $user->update($validated);
+        
+        return response()->json([
+            "message"=>"Succesfully updated employee"
+        ]);
+
     }
 }

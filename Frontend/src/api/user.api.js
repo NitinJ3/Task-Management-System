@@ -12,3 +12,10 @@ export const getDepartmentTeamLeads = () => {
 export const getDepartmentEmployees = () => {
     return axios.get('/users/employees');
 }
+
+export const getUserById = (id) =>{
+    return axios.get(`/user/employee/${id}`);
+}
+export const updateUser = (data) =>{
+    return axios.patch('/user/employee/update',data)
+}
