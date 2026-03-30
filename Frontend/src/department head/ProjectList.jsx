@@ -29,51 +29,80 @@ const ProjectList = () => {
 
 
 
- return (
-  <div>
-    <div>
+return (
+  <div className=" bg-gray-100 p-6">
+
+    <div className="max-w-5xl mx-auto">
+      
       {data.length === 0 ? (
-        <p>No Projects Found</p>
+        <p className="text-center text-gray-600 text-lg">
+          No Projects Found
+        </p>
       ) : (
         <>
-          <h1>Project List</h1>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-800">
+              Project List
+            </h1>
 
-          {data.map((project) => (
-            <div key={project.id}>
-              <h3>Name: {project.name}</h3>
+            <button
+              onClick={handleCreate}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              Create Project
+            </button>
+          </div>
 
-              <p>
-                {new Date(project.start_date + "T00:00:00").toLocaleDateString(
-                  "en-GB",
-                  {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  }
-                )}
-              </p>
+          {/* Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {data.map((project) => (
+              <div
+                key={project.id}
+                className="bg-white shadow-md rounded-xl p-5 hover:shadow-lg transition"
+              >
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  {project.name}
+                </h3>
 
-              <p>
-                {new Date(project.end_date + "T00:00:00").toLocaleDateString(
-                  "en-GB",
-                  {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  }
-                )}
-              </p>
+                <p className="text-sm text-gray-600 mb-1">
+                  <span className="font-medium">Start:</span>{" "}
+                  {new Date(project.start_date + "T00:00:00").toLocaleDateString(
+                    "en-GB",
+                    {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    }
+                  )}
+                </p>
 
-              <button onClick={() => handleView(project.id)}>View</button>
-            </div>
-          ))}
+                <p className="text-sm text-gray-600 mb-4">
+                  <span className="font-medium">End:</span>{" "}
+                  {new Date(project.end_date + "T00:00:00").toLocaleDateString(
+                    "en-GB",
+                    {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    }
+                  )}
+                </p>
+
+                <button
+                  onClick={() => handleView(project.id)}
+                  className="w-full py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition"
+                >
+                  View
+                </button>
+              </div>
+            ))}
+
+          </div>
         </>
       )}
+
     </div>
-
-    <br />
-
-    <button onClick={handleCreate}>Create Project</button>
   </div>
 );
 }

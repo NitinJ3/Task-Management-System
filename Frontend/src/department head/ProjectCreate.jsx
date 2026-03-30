@@ -110,13 +110,21 @@ const ProjectCreate = () => {
     }
   }
 
-  return (
-    <div>
+ return (
+  <div className=" flex items-center justify-center bg-gray-100 px-4">
+    <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-2xl">
 
-        {edit?<h1>Project Edit</h1>:<h1>Project Create</h1>}
-      <form onSubmit={handleSubmit(onsubmit)}>
-        <label>
-          Project Name
+      <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
+        {edit ? "Project Edit" : "Project Create"}
+      </h1>
+
+      <form onSubmit={handleSubmit(onsubmit)} className="space-y-5">
+
+        {/* Project Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Project Name
+          </label>
           <input
             type="text"
             placeholder="Project Name"
@@ -127,11 +135,20 @@ const ProjectCreate = () => {
                 message: "Must be at least 3 characters",
               },
             })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </label>
-        {errors.name && <p>{errors.name.message}</p>}
-        <label>
-          Project Description
+          {errors.name && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.name.message}
+            </p>
+          )}
+        </div>
+
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Project Description
+          </label>
           <textarea
             placeholder="Project Description"
             {...register("description", {
@@ -141,69 +158,125 @@ const ProjectCreate = () => {
                 message: "Description must be at least 8 characters long",
               },
             })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg h-24 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </label>
-        {errors.description && <p>{errors.description.message}</p>}
-        <label>
-          Status
-          <select
-            {...register("status", {
-              required: "Status is required",
-            })}
-          >
-            <option value="">Select Status</option>
-            <option value="pending">Pending</option>
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-          </select>
-        </label>
-        {errors.status && <p>{errors.status.message}</p>}
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.description.message}
+            </p>
+          )}
+        </div>
 
-        <label>
-          Team Leader
-          <select
-            {...register("team_leader", {
-              required: "Team Leader is required",
-            })}
-          >
-            <option value="">{team_leads?.length==0 ? "No Team Lead Available" :"Select Team Leader"}</option>
-            {team_leads?.map((lead) => (
-              <option key={lead.id} value={lead.id}>
-                {lead.name}
+        {/* Status + Team Leader (2 columns) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              {...register("status", {
+                required: "Status is required",
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Status</option>
+              <option value="pending">Pending</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+            </select>
+            {errors.status && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.status.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Team Leader
+            </label>
+            <select
+              {...register("team_leader", {
+                required: "Team Leader is required",
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">
+                {team_leads?.length == 0
+                  ? "No Team Lead Available"
+                  : "Select Team Leader"}
               </option>
-            ))}
-          </select>
-        </label>
-  {errors.team_leader && <p>{errors.team_leader.message}</p>}
-        <label>
-          Start Date
-          <input
-            type="date"
-            {...register("start_date", {
-              required: "Start date is required",
-            })}
-          />
-        </label>
-        {errors.start_date && <p>{errors.start_date.message}</p>}
+              {team_leads?.map((lead) => (
+                <option key={lead.id} value={lead.id}>
+                  {lead.name}
+                </option>
+              ))}
+            </select>
+            {errors.team_leader && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.team_leader.message}
+              </p>
+            )}
+          </div>
 
-        <label>
-          End Date
-          <input
-            type="date"
-            {...register("end_date", {
-              required: "End date is required",
-              validate: (value) =>
-                value > watch("start_date") ||
-                "End date must be after start date",
-            })}
-          />
-        </label>
-        {errors.end_date && <p>{errors.end_date.message}</p>}
+        </div>
 
-        <input type="submit" value={edit ? "Update" : "Create"} />
+        {/* Dates (2 columns) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Start Date
+            </label>
+            <input
+              type="date"
+              {...register("start_date", {
+                required: "Start date is required",
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.start_date && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.start_date.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              End Date
+            </label>
+            <input
+              type="date"
+              {...register("end_date", {
+                required: "End date is required",
+                validate: (value) =>
+                  value > watch("start_date") ||
+                  "End date must be after start date",
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.end_date && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.end_date.message}
+              </p>
+            )}
+          </div>
+
+        </div>
+
+        {/* Submit */}
+        <input
+          type="submit"
+          value={edit ? "Update" : "Create"}
+          className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition cursor-pointer"
+        />
+
       </form>
     </div>
-  );
+  </div>
+);
 };
 
 export default ProjectCreate;

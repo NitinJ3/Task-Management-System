@@ -133,17 +133,28 @@ const TaskCreate = () => {
     }
   }
 
-  return (
-    <div>
-      <form onSubmit={handleSubmit(onsubmit)}>
-        <label>
-          Select Project
-          <select 
+ return (
+  <div className="min-h-screen bg-gray-100 p-6">
+    
+    <div className="max-w-4xl mx-auto bg-white shadow-md rounded-xl p-6">
+      
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">
+        {edit ? "Update Task" : "Create Task"}
+      </h1>
+
+      <form onSubmit={handleSubmit(onsubmit)} className="space-y-5">
+
+        {/* Project */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Select Project
+          </label>
+          <select
             {...register("project_id", {
               required: { value: true, message: "Project is required" },
-              
             })}
-            onChange = {(e)=>AssociatedEmployees(e.target.value)}
+            onChange={(e) => AssociatedEmployees(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select Project</option>
             {project?.map((proj) => (
@@ -152,11 +163,18 @@ const TaskCreate = () => {
               </option>
             ))}
           </select>
-        </label>
-        {errors.project_id && <p>{errors.project_id.message}</p>}
+          {errors.project_id && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.project_id.message}
+            </p>
+          )}
+        </div>
 
-        <label>
-          Task Name
+        {/* Task Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Task Name
+          </label>
           <input
             {...register("title", {
               required: { value: true, message: "Task title is required" },
@@ -165,84 +183,148 @@ const TaskCreate = () => {
                 message: "Task name must be at least 3 characters long",
               },
             })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          {errors.title && <p>{errors.title.message}</p>}
-        </label>
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.title.message}
+            </p>
+          )}
+        </div>
 
-        <label>Task Description</label>
-        <textarea
-          {...register("description", {
-            required: { value: true, message: "Task description is required" },
-            minLength: {
-              value: 8,
-              message: "Task description must be at least 8 characters long",
-            },
-          })}
-        />
-        {errors.description && <p>{errors.description.message}</p>}
-
-        <label>
-          Employees
-          <select
-            {...register("assigned_to", {
-              required: {
-                value: true,
-                message: "Employee needs to be assigned",
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Task Description
+          </label>
+          <textarea
+            {...register("description", {
+              required: { value: true, message: "Task description is required" },
+              minLength: {
+                value: 8,
+                message: "Task description must be at least 8 characters long",
               },
             })}
-          >
-            <option value="">Employees</option>
-            {employee?.map((emp) => (
-              <option key={emp.id} value={emp.id}>
-               {emp.role_id === 2 ? `${emp.name} (Team Leader)` : emp.name}
-              </option>
-            ))}
-          </select>
-          {errors.assigned_to && <p>{errors.assigned_to.message}</p>}
-        </label>
-        <label>
-          Status
-          <select
-            {...register("status", {
-              required: { value: true, message: "Status is required" },
-            })}
-          >
-            <option value="pending">Pending</option>
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-          </select>
-          {errors.status && <p>{errors.status.message}</p>}
-        </label>
-
-        <label>
-          Priority
-          <select
-            {...register("priority", {
-              required: { value: true, message: "Priority is required" },
-            })}
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-          {errors.priority && <p>{errors.priority.message}</p>}
-        </label>
-
-        <label>
-          Deadline
-          <input
-            type="date"
-            {...register("due_date", {
-              required: { value: true, message: "Deadline is required" },
-            })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg h-24 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          {errors.due_date && <p>{errors.due_date.message}</p>}
-        </label>
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.description.message}
+            </p>
+          )}
+        </div>
 
-        <button type="submit">{edit ? "Update Task" : "Create Task"}</button>
+        {/* Employee + Status */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Employees
+            </label>
+            <select
+              {...register("assigned_to", {
+                required: {
+                  value: true,
+                  message: "Employee needs to be assigned",
+                },
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Employees</option>
+              {employee?.map((emp) => (
+                <option key={emp.id} value={emp.id}>
+                  {emp.role_id === 2
+                    ? `${emp.name} (Team Leader)`
+                    : emp.name}
+                </option>
+              ))}
+            </select>
+            {errors.assigned_to && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.assigned_to.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              {...register("status", {
+                required: { value: true, message: "Status is required" },
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="pending">Pending</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+            </select>
+            {errors.status && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.status.message}
+              </p>
+            )}
+          </div>
+
+        </div>
+
+        {/* Priority + Deadline */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Priority
+            </label>
+            <select
+              {...register("priority", {
+                required: { value: true, message: "Priority is required" },
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+            {errors.priority && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.priority.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Deadline
+            </label>
+            <input
+              type="date"
+              {...register("due_date", {
+                required: { value: true, message: "Deadline is required" },
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.due_date && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.due_date.message}
+              </p>
+            )}
+          </div>
+
+        </div>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+        >
+          {edit ? "Update Task" : "Create Task"}
+        </button>
+
       </form>
     </div>
-  );
+  </div>
+);
 };
 
 export default TaskCreate;

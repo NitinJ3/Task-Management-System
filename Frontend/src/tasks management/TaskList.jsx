@@ -88,46 +88,92 @@ const TaskList = () => {
         alert("Error deleting task: " + error.response.data.message);
       });
   }
-  return (
-    <div>
-      {project?.length === 0 ? (
-        <p>No Projects Available</p>
-      ) : (
-        <select
-          defaultValue={id ? id : project[0].id}
-          onChange={(e) => {
-            fetchTasks(e.target.value);
-          }}
-        >
-          {project.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
-      )}
+ return (
+  <div className="min-h-screen bg-gray-100 p-6">
+    
+    <div className="max-w-6xl mx-auto">
 
+      {/* Top Section */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        
+        {project?.length === 0 ? (
+          <p className="text-gray-600">No Projects Available</p>
+        ) : (
+          <select
+            defaultValue={id ? id : project[0].id}
+            onChange={(e) => {
+              fetchTasks(e.target.value);
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {project.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        )}
+
+        <button
+          onClick={() => navigate("/tasks/create")}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Add New Task
+        </button>
+      </div>
+
+      {/* Tasks */}
       <div>
         {task?.length === 0 ? (
-          <p>No Tasks Available</p>
+          <p className="text-gray-600">No Tasks Available</p>
         ) : (
-          task.map((t) => (
-            <div key={t.id}>
-              <h3> Title: {t.title}</h3>
-              <p> Description: {t.description}</p>
-              <p> Status: {t.status}</p>
-              <p> Priority: {t.priority}</p>
-              <p> Due Date: {t.due_date}</p>
-              <p> Assigned To: {t.user.name}</p>
-              <button onClick={() => handleEdit(t.id)}>Edit</button>
-              <button onClick={() => handleDelete(t.id)}>Delete</button>
-            </div>
-          ))
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {task.map((t) => (
+              <div
+                key={t.id}
+                className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition"
+              >
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  {t.title}
+                </h3>
+
+                <p className="text-sm text-gray-600 mb-2">
+                  {t.description}
+                </p>
+
+                <div className="text-sm text-gray-600 space-y-1 mb-4">
+                  <p><span className="font-medium">Status:</span> {t.status}</p>
+                  <p><span className="font-medium">Priority:</span> {t.priority}</p>
+                  <p><span className="font-medium">Due:</span> {t.due_date}</p>
+                  <p><span className="font-medium">Assigned:</span> {t.user.name}</p>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleEdit(t.id)}
+                    className="flex-1 py-1.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(t.id)}
+                    className="flex-1 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+
+          </div>
         )}
       </div>
-      <button onClick={() => navigate("/tasks/create")}>Add New Task</button>
+
     </div>
-  );
+  </div>
+);
 };
 
 export default TaskList;
