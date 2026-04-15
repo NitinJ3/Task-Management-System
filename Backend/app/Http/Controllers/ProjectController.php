@@ -26,21 +26,56 @@ class ProjectController extends Controller
 
 
     //fetch all projects in your department
+    // public function getProjects()
+    // {
+
+    //   $projects = Project::where('department', Auth::user()->department)
+    //             ->where('status', '!=', 'completed')
+    //             ->get();
+
+    //     if (!$projects || $projects->isEmpty()) {
+    //         return response()->json([
+    //             "message" => "No Projects Found"
+    //         ], 404);
+    //     }
+
+    //     return response()->json([
+    //         "projects" => $projects
+    //     ], 200);
+    // }
+
+
     public function getProjects()
-    {
+{
+    $department = Auth::user()->department;
 
-        $projects = Project::where('department', Auth::user()->department)->get();
+    // Existing projects (non-completed)
+    $projects = Project::where('department', $department)
+                ->where('status', '!=', 'completed')
+                ->get();
 
-        if (!$projects || $projects->isEmpty()) {
-            return response()->json([
-                "message" => "No Projects Found"
-            ], 404);
-        }
+    //  Add counts
+    $total = Project::where('department', $department)->count();
 
+    $completed = Project::where('department', $department)
+                        ->where('status', 'completed')
+                        ->count();
+
+    if ($projects->isEmpty()) {
         return response()->json([
-            "projects" => $projects
-        ], 200);
+            "message" => "No Projects Found",
+            "projects" => [],
+            "total_projects" => $total,
+            "completed_projects" => $completed
+        ], 200); // better than 404 for dashboard
     }
+
+    return response()->json([
+        "projects" => $projects,
+        "total_projects" => $total,
+        "completed_projects" => $completed
+    ], 200);
+}
 
     //create a project
     public function createProject(Request $request)
@@ -136,6 +171,15 @@ class ProjectController extends Controller
 
         $project->update($validated);
 
+
+        //if project is marked completed then all the tasks under that project will also be marked completed
+    if ($project->status === 'completed') {
+        $project->tasks()->update([
+            'status' => 'completed'
+        ]);
+    }
+
+
         return response()->json([
             "message" => "updated",
             "project" => $project
@@ -162,11 +206,31 @@ class ProjectController extends Controller
         ], 200);
     }
 
+    //completed projects
+    function getPrevious(){
+        $projects = Project::where('department', Auth::user()->department)
+        ->where('status', 'completed')
+        ->get();
+
+        if (!$projects || $projects->isEmpty()) {
+            return response()->json([
+                "message" => "No Projects Found"
+            ], 404);
+        }
+
+        return response()->json([
+            "projects" => $projects
+        ], 200);    
+    }
+
+
     //fetch all projects which belong to team leader
     function getTeamLeaderProjects()
     {
 
-        $projects = Project::where('team_leader', Auth::id())->get();
+        $projects = Project::where('team_leader', Auth::id())
+        ->where('status', '!=', 'completed')
+        ->get();
 
         if ($projects->isEmpty()) {
             return response()->json([
@@ -179,30 +243,50 @@ class ProjectController extends Controller
         ], 200);
     }
 
-
-    //fetch all projects in which employees are assigned through tasks assigned to the employees
-    function getProjectsByEmployee()
+    //this includes team leader and all employees of the department
+    function getAssociatedEmployees($id)
     {
-
-
-
-        $projects = Project::whereHas('tasks', function ($query) {
-            $query->where('assigned_to', Auth::id());
-        })
-            ->with(['tasks' => function ($query) {
-                $query->where('assigned_to', Auth::id());
-            }])
-            ->get();
-
-        if (!$projects) {
-
-            return response()->json([
-                "message" => "You arent assigned any taks"
-            ]);
+        $response = $this->verifyProjectAcess($id);
+        if ($response) {
+            return $response;
         }
 
+        $project = Project::with('user')->findOrFail($id);
+
+        $lead = $project->user;
+
+        $users = User::where('department', Auth::user()->department)
+            ->where('role_id', 3)
+            ->get();
+
+        $users->push($lead);
+
         return response()->json([
-            'projects' => $projects
+            "employees" => $users
         ]);
     }
+
+
+    //fetch all projects in which employees are assigned through tasks assigned to the employees
+   function getProjectsByEmployee()
+{   
+    $projects = Project::whereHas('tasks', function ($query) {
+        $query->where('assigned_to', Auth::id());
+    })
+    ->with(['tasks' => function ($query) {  
+        $query->where('assigned_to', Auth::id());
+    }])
+    ->get();
+
+    if ($projects->isEmpty()) {
+        return response()->json([
+            "message" => "You arent assigned any tasks",
+            "projects" => []
+        ], 200);
+    }
+
+    return response()->json([
+        'projects' => $projects
+    ]);
+}
 }

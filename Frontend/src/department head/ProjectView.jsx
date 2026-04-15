@@ -3,10 +3,13 @@ import { useParams } from "react-router-dom";
 import { getProject } from '../api/project.api';
 import { useNavigate } from 'react-router-dom';
 import { deleteProject } from '../api/project.api';
+import { useSearchParams } from "react-router-dom";
 
 const ProjectView = () => {
  const {id} = useParams();
  const [project,setProject] = useState(); 
+ const [searchParams] = useSearchParams();
+ const past = searchParams.get('completed') == "true";
 
 const navigate = useNavigate();
 
@@ -51,6 +54,16 @@ useEffect(()=>{
 
     }
 
+    function handleView(id){
+        if(past){
+                navigate(`/tasks/${project.id}/?completed=true`);
+        }
+        else{
+        navigate(`/tasks/${project.id}`);
+        }
+    }
+
+
 //make style seem like a popup window
   return (
     project?(
@@ -58,11 +71,11 @@ useEffect(()=>{
             <h3>Name: {project.name}</h3>
             <p>Description: {project.description}</p>
             <p>Department: {project.department}</p>
-            <p>Team Leader: {project.user.name}</p>
+            <p>Team Leader: {project.user?.name ? project.user.name:"Not Assigned"}</p>
             <p>Start Date: {project.start_date}</p>
             <p>End Date: {project.end_date}</p>
             <p>Status: {project.status}</p>
-            <button onClick={()=>{navigate(`/tasks/${project.id}`)}} >Tasks</button>
+            <button onClick={()=>handleView(project.id)} >Tasks</button>
             <button onClick={()=>{edit(project.id)}}>Edit</button>
             <button onClick={()=>{destroy(project.id)}}>Delete</button>
         </div>

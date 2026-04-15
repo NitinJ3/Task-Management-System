@@ -33,7 +33,7 @@ const Login = () => {
         } else if (response.data.user.role_id === 2) {
           navigate("/lead/dashboard");
         } else {
-          navigate("/");
+          navigate("/UserDashboard");
         }
       })
       .catch((error) => {

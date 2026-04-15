@@ -8,7 +8,7 @@ export const UserProvider = ({ children }) => {
 
 
   useEffect(() => { 
-
+    document.title = "Task Management System";
     if(localStorage.getItem('token')){
       getUser()
       .then((response)=>{

@@ -16,6 +16,15 @@ import TaskCreate from "./tasks management/TaskCreate";
 import UserList from "./department head/UserList";
 import LeadDashboard from "./tasks management/LeadDashboard";
 import UserEdit from "./department head/UserEdit";
+import Leader_Projects from "./Leader_Projects";
+import CompletedProjects from "./department head/CompletedProjects";
+import MyTask from "./MyTask";
+import MyTaskView from "./MyTaskView";
+import UserProject from "./UserProject";
+import UserDashboard from "./UserDashboard";
+import Leave from "./Leave";
+import LeaveHead from "./department head/LeaveHead";
+
 
 function App() {
   const router = createBrowserRouter([
@@ -61,19 +70,28 @@ function App() {
               element: <ProjectCreate />,
             },
             {
-              path:"/head/users",
-              element:<UserList/>
+              path: "/head/users",
+              element: <UserList />
             },
             {
-              path:"/head/users/edit/:id",
-              element:<UserEdit/>
+              path: "/head/users/edit/:id",
+              element: <UserEdit />
+            },
+            {
+              path: "/head/projects/completed",
+              element: <CompletedProjects />,
+
+            },
+            {
+              path:"/head/leaves",
+              element:<LeaveHead />
             }
           ],
         },
       ],
     },
 
-    //department head and team leader routes
+    //department head or team leader routes
 
     {
       element: <TaskRoute />,
@@ -84,6 +102,10 @@ function App() {
             {
               path: "/lead/dashboard",
               element: <LeadDashboard />,
+            },
+            {
+              path: "/lead/projects",
+              element: <Leader_Projects />,
             },
             {
               path: "/tasks",
@@ -105,6 +127,32 @@ function App() {
         },
       ],
     },
+    {
+      element: <Navbar />,
+      children: [
+        {
+          path: "/mytasks",
+          element: <MyTask />,
+        },
+        {
+          path: "/mytasks/task/:id",
+          element: <MyTaskView />
+        },
+        {
+          path: "/UserProjects",
+          element: <UserProject />
+        },
+        {
+          path: "/UserDashboard",
+          element: <UserDashboard />
+        },
+        {
+          path:"/leaves",
+          element:<Leave/>
+        }
+      ]
+    },
+
   ]);
 
   return (

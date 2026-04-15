@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Role;
+use App\Models\Registration;
 
 class UserController extends Controller
 {   
@@ -14,18 +15,76 @@ class UserController extends Controller
     public function registerUser(Request $request)
     {
 
-        $validated = $request->validate([
+        if($request->registered_role == 1) {
+            // Handle department head registration
+            $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
+            'department' => 'required|string|max:255|unique:users',
         ]);
 
-        $user = User::create($validated);
-
-        return response()->json([
+            $validated['role_id']=1;
+            $user = User::create($validated);
+            return response()->json([
             "message" => "User registration succesfull"
         ]);
+
+        } 
+        
+           
+        else if($request->registered_role == 2) {
+            // Handle employee registration
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:6',
+            ]);
+
+            $code = $request->registration_code;
+
+            $column = Registration::where("code", $code)->first();
+            if (!$column) {
+                return response()->json([
+                    "message" => "Invalid registration code"
+                ], 400);
+            }
+            else{
+                $head = User::find($column->user_id);
+                $validated['department'] = $head->department;
+            }
+
+            $validated['role_id'] = 3; 
+            $user = User::create($validated);
+            return response()->json([
+            "message" => "User registration succesfull"
+        ]);
+        }
+
+        
     }
+
+ public function createCode()
+{
+    if (!Auth::check()) {
+        return response()->json([
+            'error' => 'User not logged in'
+        ], 401);
+    }
+
+    $user_id = Auth::user()->id;
+    $column = Registration::where('user_id',$user_id)->delete();
+    
+    $registration = new Registration();
+    $registration->user_id = Auth::id(); 
+    $registration->code = random_int(10000000, 99999999);
+    $registration->save();
+
+    return response()->json([
+        "message" => "Registration code created",
+        "code" => $registration->code
+    ]);
+}
 
     public function loginUser(Request $request)
     {
@@ -151,6 +210,29 @@ class UserController extends Controller
         
         return response()->json([
             "message"=>"Succesfully updated employee"
+        ]);
+
+    }
+
+    function deleteUser($id){
+        $user = User::find($id);
+
+         if(!$user){
+            return response()->json([
+                "message"=>"User doesn't exist"
+            ],404);
+        }
+
+        if($user->department!=Auth::user()->department){
+            return response()->json([
+                "message"=>"You are trying to delete a user not in your department"
+            ],403);
+        }
+
+        $user->delete();
+        
+        return response()->json([
+            "message"=>"Succesfully deleted employee"
         ]);
 
     }

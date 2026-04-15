@@ -8,17 +8,25 @@ import { useParams } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { getProjectsByEmployee } from "../api/project.api";
 import { getTeamLeaderProjects } from "../api/project.api";
+import { useSearchParams } from "react-router-dom";
+
 
 const TaskList = () => {
   const [project, setProject] = useState([]);
+  const [currentProject, setCurrentProject] = useState(null); // to keep track of the currently selected project by id
   const [task, setTask] = useState([]);
   const navigate = useNavigate();
   const { id } = useParams();
   const { user } = useUser();
+  const [searchParams] = useSearchParams();
+  const past = searchParams.get('completed') == "true";
+
+
 
   function fetchTasks(project_id) {
     showTasks(project_id)
       .then((response) => {
+        setCurrentProject(project_id);
         console.log(response.data.tasks);
         setTask(response.data.tasks);
       })
@@ -40,8 +48,10 @@ const TaskList = () => {
           setProject(response.data.projects);
           if (id) {
             fetchTasks(id);
+           
           } else {
             fetchTasks(response.data.projects[0].id);
+            
           }
         })
         .catch((error) => {
@@ -93,6 +103,8 @@ const TaskList = () => {
       {project?.length === 0 ? (
         <p>No Projects Available</p>
       ) : (
+        <>
+        {past?<></>:(
         <select
           defaultValue={id ? id : project[0].id}
           onChange={(e) => {
@@ -105,8 +117,10 @@ const TaskList = () => {
             </option>
           ))}
         </select>
+          )}
+        </>
       )}
-
+        <h2>Tasks</h2>
       <div>
         {task?.length === 0 ? (
           <p>No Tasks Available</p>
@@ -118,14 +132,14 @@ const TaskList = () => {
               <p> Status: {t.status}</p>
               <p> Priority: {t.priority}</p>
               <p> Due Date: {t.due_date}</p>
-              <p> Assigned To: {t.user.name}</p>
+              <p>Assigned To: {t.user?.name || "Not Assigned"}</p>
               <button onClick={() => handleEdit(t.id)}>Edit</button>
               <button onClick={() => handleDelete(t.id)}>Delete</button>
             </div>
           ))
         )}
       </div>
-      <button onClick={() => navigate("/tasks/create")}>Add New Task</button>
+      <button onClick={() => navigate(`/tasks/create/?project_id=${currentProject}`)}>Add New Task</button>
     </div>
   );
 };

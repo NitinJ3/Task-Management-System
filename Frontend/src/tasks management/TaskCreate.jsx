@@ -9,6 +9,7 @@ import { getTask } from "../api/task.api";
 import { useUser } from "../context/UserContext";
 import { getTeamLeaderProjects } from "../api/project.api";
 import { getAsscociatedEmployees } from "../api/project.api";
+import { useSearchParams } from "react-router-dom";   
 
 
 const TaskCreate = () => {
@@ -18,16 +19,21 @@ const TaskCreate = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const {user} = useUser();
+  const [searchParams] = useSearchParams();
+  const project_id = Number(searchParams.get('project_id'));
+  console.log("page rendered");
 
   const {
     register,
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useForm();
 
   useEffect(() => {
+    
     if(user?.role_id===1){
     showProjects()
       .then((res) => {
@@ -41,6 +47,7 @@ const TaskCreate = () => {
         }
         console.log(err);
       });
+
     }
     
     else if(user?.role_id===2){
@@ -55,7 +62,7 @@ const TaskCreate = () => {
       });
     }
 
-          
+      
 
     if (id) {
       setEdit(true);
@@ -74,6 +81,11 @@ const TaskCreate = () => {
         });
     }
   }, []);
+
+  useEffect(() => {
+    if(project_id){
+      setValue("project_id", project_id);}
+    },[project]);
 
 
   //this includes team leader and all employees of the department
@@ -112,7 +124,7 @@ const TaskCreate = () => {
         });
     } else {
       const trimmedData = {
-        project_id: data.project_id.trim(),
+        project_id: data.project_id,
         title: data.title.trim(),
         description: data.description.trim(),
         assigned_to: data.assigned_to.trim(),
@@ -143,6 +155,7 @@ const TaskCreate = () => {
               required: { value: true, message: "Project is required" },
               
             })}
+           
             onChange = {(e)=>AssociatedEmployees(e.target.value)}
           >
             <option value="">Select Project</option>

@@ -119,13 +119,27 @@ class TaskController extends Controller
     //get a task by its id
     public function getTask($id)
     {
-
-
-        $task = Task::find($id);
+        $task = Task::with('project')->find($id);
 
         if (!$task) {
             return response()->json(['message' => 'Task not found'], 404);
         }
+
+        $user = Auth::user();
+
+        if ($user->role_id == 3 && $user->id != $task->assigned_to) {
+            return response()->json(["message" => "Its not your task"], 403);
+        }
+
+        if ($user->role_id == 1 && $user->id != $task->project->created_by) {
+            return response()->json(["message" => "Not your project"], 403);
+        }
+
+        if ($user->role_id == 2 && $user->id != $task->project->team_leader) {
+            return response()->json(["message" => "Not team leader"], 403);
+        }
+
+       
 
         return response()->json(['task' => $task], 200);
     }
@@ -168,23 +182,65 @@ class TaskController extends Controller
         return response()->json(['message' => 'Task updated successfully', 'task' => $task], 200);
     }
 
+      public function toDoTasks($id)
+{
+    $userId = Auth::id();
 
-    //this includes team leader and all employees of the department
-    function getAssociatedEmployees($id)
-    {
+    return response()->json([
+        'low' => Task::where('assigned_to', $userId)
+                    ->where('project_id', $id)
+                    ->where('priority', 'low')
+                    ->where('status', '!=', 'completed')
+                    ->orderBy('due_date', 'asc')
+                    ->get(),
 
-        $project = Project::with('user')->findOrFail($id);
+        'medium' => Task::where('assigned_to', $userId)
+                        ->where('project_id', $id)
+                        ->where('priority', 'medium')
+                        ->where('status', '!=', 'completed')
+                        ->orderBy('due_date', 'asc')
+                        ->get(),
 
-        $lead = $project->user;
+        'high' => Task::where('assigned_to', $userId)
+                      ->where('project_id', $id)
+                      ->where('priority', 'high')
+                      ->where('status', '!=', 'completed')
+                      ->orderBy('due_date', 'asc')
+                      ->get(),
+    ], 200);
+}
 
-        $users = User::where('department', Auth::user()->department)
-            ->where('role_id', 3)
-            ->get();
+public function toggleStatus(Request $request, $id)
+{
+    $task = Task::find($id);
 
-        $users->push($lead);
-
+    if (!$task) {
         return response()->json([
-            "employees" => $users
-        ]);
+            "message" => "Task not found"
+        ], 404);
     }
+
+    // Optional: authorization check
+    if (Auth::id() != $task->assigned_to) {
+        return response()->json([
+            "message" => "Unauthorized"
+        ], 403);
+    }
+
+    // Validate status
+    $validated = $request->validate([
+        'status' => 'required|in:active,completed'
+    ]);
+
+    // Update status
+    $task->status = $validated['status'];
+    $task->save();
+
+    return response()->json([
+        "message" => "Status updated",
+        "task" => $task
+    ], 200);
+}
+
+
 }

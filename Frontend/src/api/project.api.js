@@ -28,6 +28,10 @@ export const getAsscociatedEmployees = (project_id) => {
     return axios.get(`/project/employees/${project_id}`);
 }
 
-export const getProjectsByEmployee = (employee_id) => {
-    return axios.get(`/employee/projects/${employee_id}`);
+export const getProjectsByEmployee = () => {
+    return axios.get(`/employee/projects`);
+}
+
+export const getPrevious = () =>{
+    return axios.get('/head/projects/completed');
 }

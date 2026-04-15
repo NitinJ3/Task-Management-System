@@ -19,3 +19,10 @@ export const getUserById = (id) =>{
 export const updateUser = (data) =>{
     return axios.patch('/user/employee/update',data)
 }
+
+export const createCode = () => {
+    return axios.get('/users/add');
+}
+export const deleteUser = (id) => {
+    return axios.delete(`/user/employee/delete/${id}`);
+}

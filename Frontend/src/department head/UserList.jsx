@@ -2,11 +2,13 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { getDepartmentEmployees } from "../api/user.api";
 import { useNavigate } from "react-router-dom";
+import { createCode } from "../api/user.api";
+
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
-  const navigate = useNavigate();  
-
+  const navigate = useNavigate();
+  const [code, setCode] = useState("");
 
   useEffect(() => {
     getDepartmentEmployees()
@@ -15,13 +17,26 @@ const UserList = () => {
         console.log(response.data.employees);
       })
       .catch((error) => {
-        if (error.response.data.status == "404") {
+        if (error.response?.status == "404") {
           alert(error.response.data.message);
         } else {
           alert(error);
         }
       });
   }, []);
+
+  function createUser() {
+    createCode()
+      .then((response) => {
+        const code = response.data.code;
+        setCode(code);
+        console.log(code);
+      })
+      .catch((error) => {
+        alert(error);
+      });
+  }
+
 
   return (
     <div>
@@ -45,13 +60,16 @@ const UserList = () => {
                 <td>{user.is_active == 1 ? "Active" : "Non Active"}</td>
                 <td>{user.role.name}</td>
                 <td>
-                <button onClick={()=>navigate(`/head/users/edit/${user.id}`)}>Edit</button>
+                  <button onClick={() => navigate(`/head/users/edit/${user.id}`)}>Edit</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <br />
+      <button onClick={createUser}>Create User</button>
+      {code && <><p>Registration Code: {code}</p> <p>Give this code to your employees for registration.</p> </>}
     </div>
   );
 };

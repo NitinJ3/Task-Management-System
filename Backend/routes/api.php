@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\LeaveController;
 
 
 // Route::get('/user', function (Request $request) {
@@ -34,6 +35,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get("/user/employee/{id}",[UserController::class,'getUserById']);
         Route::patch("/user/employee/update",[UserController::class,'updateUser']);
+        Route::get("/users/add",[UserController::class,'createCode']);
+        Route::delete("/user/employee/delete/{id}",[UserController::class,'deleteUser']);
+        Route::get("/head/projects/completed",[ProjectController::class,'getPrevious']);
+        Route::get('/leave/department', [LeaveController::class, 'showDepartmentLeaves']);
+        Route::put('/leave/approve/{id}', [LeaveController::class, 'approveLeave']);
+        Route::put('/leave/reject/{id}', [LeaveController::class, 'rejectLeave']);
     });
 
     Route::middleware('role:1,2')->group(function () {
@@ -46,10 +53,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/tasks/edit', [TaskController::class, 'updateTask']);
         Route::get('/tasks/{id}', [TaskController::class, 'getTask']);
         Route::get('/leader/projects', [ProjectController::class, 'getTeamLeaderProjects']);
-        Route::get('/project/employees/{project_id}', [TaskController::class, 'getAssociatedEmployees']);
+        Route::get('/project/employees/{project_id}', [ProjectController::class, 'getAssociatedEmployees']);
     });
 
-    Route::get('project/tasks/{project_id}', [TaskController::class, 'getTasks']);
+    Route::get('/project/tasks/{project_id}', [TaskController::class, 'getTasks']);
 
     Route::get("/employee/projects", [ProjectController::class, 'getProjectsByEmployee']);
+
+    Route::get("/mytasks/{project_id}",[TaskController::class,'toDoTasks']);
+    Route::put('/tasks/status/{id}', [TaskController::class, 'toggleStatus']);
+    Route::post('/leave/apply', [LeaveController::class, 'applyLeave']);
+    Route::get('/leave/my', [LeaveController::class, 'showMyLeaves']);
 });

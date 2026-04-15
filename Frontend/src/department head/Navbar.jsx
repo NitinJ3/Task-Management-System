@@ -5,7 +5,7 @@ import { logoutUser } from '../api/auth.api';
 import { useUser } from "../context/UserContext";
 import { Outlet } from 'react-router-dom';
 
-//this will be a common navbar for all users, currently its for department head
+//this will be a common navbar for all users
 
 const Navbar = () => {
 
@@ -40,15 +40,28 @@ const Navbar = () => {
       <Link to="/head/projects">Projects</Link>
       <Link to="/tasks">Tasks</Link>
       <Link to="/head/users">Employees</Link>
+      <Link to="/head/leaves">Leaves</Link>
       </>
       )}
 
       {user && user.role_id==2 &&  (
       <> 
       <Link to="/lead/dashboard">Dashboard</Link>
+      <Link to="/lead/projects">Projects</Link>
       <Link to="/tasks">Tasks</Link>
+      <Link to="/mytasks">My Tasks</Link>
       </>
       )}
+
+       {user && user.role_id==3 &&  (
+      <> 
+            <Link to="/UserDashboard">Dashboard</Link>
+      <Link to="/UserProjects">Projects</Link>
+      <Link to="/mytasks">My Tasks</Link>
+      <Link to="/leaves">Leaves</Link>
+      </>
+      )}
+
 
 
       <button onClick={handleLogout}>Logout</button>

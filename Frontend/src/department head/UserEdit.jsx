@@ -4,9 +4,12 @@ import { get, set, useForm } from "react-hook-form";
 import { getUserById } from "../api/user.api";
 import { useParams } from "react-router-dom";
 import { updateUser } from "../api/user.api";
+import { deleteUser } from "../api/user.api";
+import { useNavigate } from "react-router-dom";
 
 const UserEdit = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -39,10 +42,26 @@ const UserEdit = () => {
     updateUser(trimmedData)
     .then((response)=>{
         alert(response.data.message);
+       
     })
     .catch((error)=>{
         alert(error.response.data.message);
     })
+
+  }
+  function handledeleteUser(id){
+    const confirmDelete = window.confirm("Are you sure you want to delete this employee?");
+    
+    if (confirmDelete) {  
+      deleteUser(id)
+      .then((response)=>{
+        alert(response.data.message);
+        navigate("/head/users");
+      })
+      .catch((error)=>{
+        alert(error.response.data.message);
+      })
+    }
 
   }
 
@@ -106,7 +125,13 @@ const UserEdit = () => {
         </label>
 
         <input type="submit" value={"Update Employee Details"} />
+
       </form>
+
+      <br />
+      <button onClick={()=>handledeleteUser(id)}>Delete Employee</button>
+
+
     </div>
   );
 };

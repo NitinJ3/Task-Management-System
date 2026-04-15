@@ -26,7 +26,9 @@ const ProjectList = () => {
     navigate("/head/projects/create")
   }
 
-
+  function handlePast(){
+    navigate("/head/projects/completed")
+  }
 
 
  return (
@@ -42,7 +44,7 @@ const ProjectList = () => {
             <div key={project.id}>
               <h3>Name: {project.name}</h3>
 
-              <p>
+              <p> Start Date:
                 {new Date(project.start_date + "T00:00:00").toLocaleDateString(
                   "en-GB",
                   {
@@ -53,7 +55,7 @@ const ProjectList = () => {
                 )}
               </p>
 
-              <p>
+              <p> End Date:
                 {new Date(project.end_date + "T00:00:00").toLocaleDateString(
                   "en-GB",
                   {
@@ -74,6 +76,7 @@ const ProjectList = () => {
     <br />
 
     <button onClick={handleCreate}>Create Project</button>
+    <button onClick={handlePast}>Completed Projects</button>
   </div>
 );
 }
