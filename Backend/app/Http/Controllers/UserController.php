@@ -153,25 +153,34 @@ class UserController extends Controller
     }
 
 
-    function getDepartmentEmployees()
-    {
+   public function getDepartmentEmployees(Request $request)
+{
+    $search = $request->query("search");
 
-        $employees = User::with("role")
-            ->where("department", Auth::user()->department)
-            ->where("role_id", "!=", 1)
-            ->get();
-        
+    $employees = User::with("role")
+        ->where("department", Auth::user()->department)
+        ->where("role_id", "!=", 1)
 
-        if (!$employees || $employees->isEmpty()) {
-            return response()->json([
-                "message" => "failed to fetch department employees"
-            ], 404);
-        }
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where("name", "like", "%{$search}%")
+                  ->orWhere("email", "like", "%{$search}%");
+            });
+        })
+
+        ->paginate(3);
+
+    if (!$employees || $employees->isEmpty()) {
         return response()->json([
-            "message" => "employees fetched",
-            "employees" => $employees
-        ]);
+            "message" => "failed to fetch department employees"
+        ], 404);
     }
+
+    return response()->json([
+        "message" => "employees fetched",
+        "employees" => $employees
+    ]);
+}
 
 
     function getUserById($id){

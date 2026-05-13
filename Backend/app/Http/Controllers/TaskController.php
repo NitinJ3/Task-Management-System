@@ -94,7 +94,7 @@ class TaskController extends Controller
             return $response;
         }
 
-        $tasks = Task::with('user')->where('project_id', $project_id)->get();
+        $tasks = Task::with('user')->where('project_id', $project_id)->paginate(5);
 
 
         if ($tasks->isEmpty()) {

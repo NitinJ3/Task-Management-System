@@ -1,11 +1,11 @@
 import axios from "./axios";
 
-export const showProjects = (data) =>{
-    return axios.get('/head/projects');
+export const showProjects = (page=1) =>{
+    return axios.get(`/head/projects?page=${page}`);
 }
 
 export const createProjects = (data) =>{
-    return axios.post('head/projects/create',data);
+    return axios.post('/head/projects/create',data);
 }
 
 export const getProject = (id) => {

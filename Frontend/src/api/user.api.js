@@ -9,9 +9,14 @@ export const getDepartmentTeamLeads = () => {
    return axios.get('/head/users/teamleads');
 }
 
-export const getDepartmentEmployees = () => {
-    return axios.get('/users/employees');
-}
+export const getDepartmentEmployees = (
+  page = 1,
+  search = ""
+) => {
+  return axios.get(
+    `/users/employees?page=${page}&search=${search}`
+  );
+};
 
 export const getUserById = (id) =>{
     return axios.get(`/user/employee/${id}`);

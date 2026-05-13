@@ -4,8 +4,8 @@ export const createTask = (data) => {
     return axios.post("/tasks/create", data);
 }
 
-export const showTasks = (project_id) => {
-    return axios.get(`/project/tasks/${project_id}`);
+export const showTasks = (project_id, page = 1) => {
+    return axios.get(`/project/tasks/${project_id}?page=${page}`);
 }
 
 export const deleteTask = (id) => {

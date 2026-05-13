@@ -32,7 +32,7 @@ class ProjectController extends Controller
 
       $projects = Project::where('department', Auth::user()->department)
                 ->where('status', '!=', 'completed')
-                ->get();
+                ->paginate(1);
 
         if (!$projects || $projects->isEmpty()) {
             return response()->json([
