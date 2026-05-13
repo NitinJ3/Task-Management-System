@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { getProjectsByEmployee } from './api/project.api';
+import { useNavigate } from 'react-router-dom';
+
 
 const UserProject = () => {
   const [projects, setProjects] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getProjectsByEmployee()
@@ -13,6 +16,12 @@ const UserProject = () => {
         console.log(error);
       });
   }, []);
+
+  function handleTasks(id){
+    navigate(`/mytasks?id=${id}`);
+    
+  }
+
 
   return (
     <div>
@@ -47,6 +56,7 @@ const UserProject = () => {
                 }
               )}
             </p>
+            <button onClick={() => handleTasks(project.id)}>View Tasks</button>
           </div>
         ))
       ) : (

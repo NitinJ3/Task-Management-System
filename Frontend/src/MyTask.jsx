@@ -3,6 +3,7 @@ import { useEffect , useState } from 'react';
 import { toDoTasks } from './api/task.api';
 import { getProjectsByEmployee } from './api/project.api';
 import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 const MyTask = () => {
 
@@ -11,6 +12,9 @@ const MyTask = () => {
     const [medium,setMedium] = useState([]);
     const [high,setHigh] = useState([]);
     const navigate = useNavigate();
+    const [searchParams]  = useSearchParams();
+    const project_id = searchParams.get('id');
+    
 
     function fetchTasks(id){
              toDoTasks(id)
@@ -31,7 +35,12 @@ const MyTask = () => {
         getProjectsByEmployee()
         .then((response)=>{
             setProjects(response.data.projects);
+            if(project_id){
+              fetchTasks(project_id);
+            }
+            else{
             fetchTasks(response.data.projects[0].id);
+          }
             console.log(response.data.projects);
         })
         .catch((error)=>{
@@ -51,10 +60,10 @@ const MyTask = () => {
     ) : (
       <>
         <select
-          defaultValue={projects[0]?.id}
+          defaultValue={project_id?project_id:projects[0]?.id}
           onChange={(e) => fetchTasks(e.target.value)}
-        >
-          <option value="">Select a project</option>
+        > 
+          
           {projects.map((project) => (
             <option key={project.id} value={project.id}>
               {project.name}
@@ -70,6 +79,7 @@ const MyTask = () => {
             <div key={task.id}>
               <p>{task.title}</p>
               <p>{task.due_date}</p>
+              <p>{task.status=="pending"?"New":""}</p>
               <button onClick={()=>handleView(task.id)}>View</button>
             </div>
           ))
@@ -83,6 +93,7 @@ const MyTask = () => {
             <div key={task.id}>
               <p>{task.title}</p>
               <p>{task.due_date}</p>
+              <p>{task.status=="pending"?"New":""}</p>
               <button onClick={()=>handleView(task.id)} >View</button>
             </div>
           ))
@@ -96,14 +107,17 @@ const MyTask = () => {
             <div key={task.id}>
               <p>{task.title}</p>
               <p>{task.due_date}</p>
+              <p>{task.status=="pending"?"New":""}</p>
               <button onClick={()=>handleView(task.id)} >View</button>
             </div>
           ))
         ) : (
           <p>No high priority tasks</p>
         )}
+        <button onClick={()=>navigate("/completed/tasks")}>View Completed Tasks</button>
       </>
     )}
+    
   </div>
 );
 }

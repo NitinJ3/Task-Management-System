@@ -46,20 +46,18 @@ const MyTaskView = () => {
       <p><strong>Priority:</strong> {task.priority}</p>
       <p><strong>Due Date:</strong> {task.due_date}</p>
 
-      {/* 🔥 Buttons */}
-      <button
-        onClick={() => handleStatusChange("active")}
-        disabled={task.status === "active"}
-      >
+      
+      {task.status=="pending" && <button
+        onClick={() => handleStatusChange("active")}>
         Start
-      </button>
-
+      </button>}
+      
+      {task.status=="active" &&
       <button
         onClick={() => handleStatusChange("completed")}
-        disabled={task.status === "completed"}
       >
         Mark Complete
-      </button>
+      </button>}
     </div>
   );
 };

@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Role;
 use App\Models\Registration;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use App\Mail\ResetPasswordMail;
+
 
 class UserController extends Controller
 {   
@@ -87,6 +91,7 @@ class UserController extends Controller
 }
 
     public function loginUser(Request $request)
+
     {
         $credentials = $request->validate([
             'email' => 'required|string|email|max:255|',
@@ -236,4 +241,113 @@ class UserController extends Controller
         ]);
 
     }
+
+    function updateOwnDetails(Request $request){
+            $user = User::find($request->id);
+            if(!$user){
+                return response()->json(["message"=>"User doesnt exist"],404);
+            }
+            else if($user->id!=Auth::user()->id){
+                return response()->json(["message"=>"You cant update someone's detail"],403);
+            }
+            else{
+                if($request->password==false){
+                    $validated = $request->validate([
+                        'name'=>'required|string|max:255',
+                        'email'=>'required|string|email|max:255|unique:users,email,'.$user->id,
+                    ]);
+
+                    $user->update($validated);
+
+                    return response()->json([
+                        "message"=>"successfully updated user details"
+                    ]);
+                }
+                else{
+
+                    $validated = $request->validate([
+                        'password' => 'required|string|min:6',
+                    ]);
+
+
+                    $user->update($validated);
+
+                    return response()->json([
+                        "message"=>"successfully updated "
+                    ]);
+
+                }
+            }
+    }
+
+
+            public function forgotPassword(Request $request)
+        {
+            $request->validate([
+                'email' => 'required|email'
+            ]);
+
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User Account does not exist'
+                ], 404);
+            }
+
+            // Generate real Laravel reset token
+            $token = Password::createToken($user);
+
+            // Send mail
+            Mail::to($request->email)
+                ->send(new ResetPasswordMail($token, $request->email));
+
+            return response()->json([
+                'message' => 'Password reset email sent'
+            ]);
+        } 
+
+
+        public function resetPassword(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'token' => 'required',
+        'password' => 'required|min:6|confirmed',
+    ]);
+
+    $status = Password::reset(
+
+        $request->only(
+            'email',
+            'password',
+            'password_confirmation',
+            'token'
+        ),
+
+        function ($user, $password) {
+
+            // Update password
+            $user->password = Hash::make($password);
+            $user->save();
+
+        }
+
+    );
+
+    if ($status === Password::PASSWORD_RESET) {
+
+        return response()->json([
+            'message' => 'Password reset successful'
+        ]);
+    }
+
+    return response()->json([
+        'message' => __($status)
+    ], 400);
+    }
+                
+
+
+
 }

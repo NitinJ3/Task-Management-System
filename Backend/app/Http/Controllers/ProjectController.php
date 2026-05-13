@@ -25,57 +25,27 @@ class ProjectController extends Controller
     }
 
 
-    //fetch all projects in your department
-    // public function getProjects()
-    // {
-
-    //   $projects = Project::where('department', Auth::user()->department)
-    //             ->where('status', '!=', 'completed')
-    //             ->get();
-
-    //     if (!$projects || $projects->isEmpty()) {
-    //         return response()->json([
-    //             "message" => "No Projects Found"
-    //         ], 404);
-    //     }
-
-    //     return response()->json([
-    //         "projects" => $projects
-    //     ], 200);
-    // }
-
+    // fetch all projects in your department
 
     public function getProjects()
-{
-    $department = Auth::user()->department;
+    {
 
-    // Existing projects (non-completed)
-    $projects = Project::where('department', $department)
+      $projects = Project::where('department', Auth::user()->department)
                 ->where('status', '!=', 'completed')
                 ->get();
 
-    //  Add counts
-    $total = Project::where('department', $department)->count();
+        if (!$projects || $projects->isEmpty()) {
+            return response()->json([
+                "message" => "No Projects Found"
+            ], 404);
+        }
 
-    $completed = Project::where('department', $department)
-                        ->where('status', 'completed')
-                        ->count();
-
-    if ($projects->isEmpty()) {
         return response()->json([
-            "message" => "No Projects Found",
-            "projects" => [],
-            "total_projects" => $total,
-            "completed_projects" => $completed
-        ], 200); // better than 404 for dashboard
+            "projects" => $projects
+        ], 200);
     }
 
-    return response()->json([
-        "projects" => $projects,
-        "total_projects" => $total,
-        "completed_projects" => $completed
-    ], 200);
-}
+
 
     //create a project
     public function createProject(Request $request)
@@ -238,8 +208,11 @@ class ProjectController extends Controller
             ], 404);
         }
 
+        $count = $projects->count();
+
         return response()->json([
-            "projects" => $projects
+            "projects" => $projects,
+            "count"=>$count
         ], 200);
     }
 
@@ -273,9 +246,10 @@ class ProjectController extends Controller
     $projects = Project::whereHas('tasks', function ($query) {
         $query->where('assigned_to', Auth::id());
     })
+    ->where('status', '!=', 'completed')              //includes only those projects which have tasks assigned to the employee
     ->with(['tasks' => function ($query) {  
         $query->where('assigned_to', Auth::id());
-    }])
+    }])                                             //includes only those tasks which are assigned to the employee
     ->get();
 
     if ($projects->isEmpty()) {
@@ -285,8 +259,36 @@ class ProjectController extends Controller
         ], 200);
     }
 
+    $count = $projects->count();
+
     return response()->json([
-        'projects' => $projects
+        'projects' => $projects,
+        'count' => $count
     ]);
 }
+
+    function getProjectStatistics(){
+        $toatal_projects = Project::where('department',Auth::user()->department)->get();
+
+        $active_projects = Project::where('department',Auth::user()->department)
+        ->where('status','active')
+        ->get();
+
+        $completed_projects = Project::where('department',Auth::user()->department)
+        ->where('status','completed')
+        ->get();
+
+        $toatal_projects = $toatal_projects->count();
+        $active_projects = $active_projects->count();
+        $completed_projects = $completed_projects->count();
+
+        return response()->json([
+            "total_projects" => $toatal_projects,
+            "active_projects" => $active_projects,
+            "completed_projects" => $completed_projects
+        ], 200);
+
+    } 
+
+    
 }

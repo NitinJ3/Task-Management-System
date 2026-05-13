@@ -7,6 +7,7 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\Leave;
 
 
 
@@ -59,6 +60,20 @@ class TaskController extends Controller
             'priority' => 'required|string|in:low,medium,high',
             'due_date' => 'required|date',
         ]);
+
+        $hasleave = Leave::with('user')->where('user_id', $validatedData['assigned_to'])
+            ->where('start_date', '<=', $validatedData['due_date'])
+            ->where('end_date', '>=', $validatedData['due_date'])
+            ->where('status', 'approved')
+            ->first();
+        
+        if ($hasleave){
+            
+            return response()->json([
+                 'message' => "{$hasleave->user->name} is on leave from $hasleave->start_date to $hasleave->end_date. Please assign the task to someone else or change the due date."
+            ], 400);
+        }
+
 
         $task = Task::create($validatedData);
 
@@ -176,6 +191,20 @@ class TaskController extends Controller
         if (!$task) {
             return response()->json(['message' => 'Task not found'], 404);
         }
+        
+        $hasleave = Leave::with('user')->where('user_id', $validatedData['assigned_to'])
+            ->where('start_date', '<=', $validatedData['due_date'])
+            ->where('end_date', '>=', $validatedData['due_date'])
+            ->where('status', 'approved')
+            ->first();
+        
+        if ($hasleave){
+            
+            return response()->json([
+                 'message' => "{$hasleave->user->name} is on leave from $hasleave->start_date to $hasleave->end_date. Please assign the task to someone else or change the due date."
+            ], 400);
+        }
+
 
         $task->update($validatedData);
 
@@ -184,7 +213,7 @@ class TaskController extends Controller
 
       public function toDoTasks($id)
 {
-    $userId = Auth::id();
+    $userId = Auth::user()->id;
 
     return response()->json([
         'low' => Task::where('assigned_to', $userId)
@@ -207,6 +236,8 @@ class TaskController extends Controller
                       ->where('status', '!=', 'completed')
                       ->orderBy('due_date', 'asc')
                       ->get(),
+
+        
     ], 200);
 }
 
@@ -242,5 +273,58 @@ public function toggleStatus(Request $request, $id)
     ], 200);
 }
 
+public function getCompletedTasks($id){
+    $userId = Auth::user()->id;
+    return response()->json([
+        "completed"=>Task::where('assigned_to',$userId)
+                    ->where('project_id',$id)
+                    ->where('status','completed')
+                    ->get(),
+    ],200);
+}
+    public function getTaskStatistics()
+{
+    $user = Auth::user();
+    
+
+    $total_tasks = Task::whereHas('user', function ($query) use ($user) {
+        $query->where('department', $user->department);
+    })->get();
+
+    $non_completed_tasks = $total_tasks
+        ->whereIn('status', ['pending', 'active'])
+        ->count();
+
+    $completed_tasks = $total_tasks
+        ->where('status', 'completed')
+        ->count();
+
+    return response()->json([
+        "total_tasks" => $total_tasks->count(),
+        "non_completed_tasks" => $non_completed_tasks,
+        "completed_tasks" => $completed_tasks
+    ], 200);
+}
+
+public function getPersonalTaskStatistics(){
+
+    $total =  Task::where('assigned_to',Auth::user()->id)
+                  ->count();
+
+    $non_completed_tasks = Task::where('assigned_to',Auth::user()->id)
+                  ->whereIn('status',['pending', 'active'])
+                  ->count();
+
+    $completed = Task::where('assigned_to',Auth::user()->id)
+                  ->where('status','completed')
+                  ->count();
+
+    return response()->json([
+        'total' => $total,
+        'noncompleted' => $non_completed_tasks,
+        'completed' => $completed
+    ]);
+    
+}
 
 }

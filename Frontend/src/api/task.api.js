@@ -26,3 +26,15 @@ export const toDoTasks = (id) => {
 export const toggleStatus = (id, status) => {
     return axios.put(`/tasks/status/${id}`, { status });
 };
+
+export const getCompletedTasks = (id) => {
+    return axios.get(`/completed/tasks/${id}`);
+}
+
+export const getTaskStatistics = () => {
+    return axios.get('/tasks/statistics');
+}
+
+export const getPersonalTaskStatistics = () => {
+    return axios.get('/employee/task/statistics');
+}

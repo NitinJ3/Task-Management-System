@@ -35,3 +35,7 @@ export const getProjectsByEmployee = () => {
 export const getPrevious = () =>{
     return axios.get('/head/projects/completed');
 }
+
+export const getProjectStatistics = () => {
+    return axios.get('/projects/statistics');
+}

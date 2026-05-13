@@ -26,3 +26,15 @@ export const createCode = () => {
 export const deleteUser = (id) => {
     return axios.delete(`/user/employee/delete/${id}`);
 }
+
+export const updateOwnDetails = (data) => {
+    return axios.patch('/update/user',data);
+}
+
+export const forgotPassword = (email) => {
+    return axios.post('/forgot-password', { email });
+}
+
+export const resetPassword = (data) => {
+    return axios.post('/reset-password', data);
+}

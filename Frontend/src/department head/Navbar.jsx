@@ -40,7 +40,8 @@ const Navbar = () => {
       <Link to="/head/projects">Projects</Link>
       <Link to="/tasks">Tasks</Link>
       <Link to="/head/users">Employees</Link>
-      <Link to="/head/leaves">Leaves</Link>
+      <Link to="/leaves">Leaves</Link>
+      <Link to="/myaccount">My Account</Link>
       </>
       )}
 
@@ -50,6 +51,8 @@ const Navbar = () => {
       <Link to="/lead/projects">Projects</Link>
       <Link to="/tasks">Tasks</Link>
       <Link to="/mytasks">My Tasks</Link>
+      <Link to="/leaves">Leaves</Link>
+      <Link to="/myaccount">My Account</Link>
       </>
       )}
 
@@ -59,6 +62,7 @@ const Navbar = () => {
       <Link to="/UserProjects">Projects</Link>
       <Link to="/mytasks">My Tasks</Link>
       <Link to="/leaves">Leaves</Link>
+      <Link to="/myaccount">My Account</Link>
       </>
       )}
 

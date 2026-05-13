@@ -13,8 +13,9 @@ use App\Http\Controllers\LeaveController;
 // })->middleware('auth:sanctum');
 
 Route::post("/register", [UserController::class, "registerUser"]);
-
 Route::post("/login", [UserController::class, "loginUser"]);
+Route::post('/forgot-password', [UserController::class, 'forgotPassword']);
+Route::post('/reset-password', [UserController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -38,9 +39,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/users/add",[UserController::class,'createCode']);
         Route::delete("/user/employee/delete/{id}",[UserController::class,'deleteUser']);
         Route::get("/head/projects/completed",[ProjectController::class,'getPrevious']);
-        Route::get('/leave/department', [LeaveController::class, 'showDepartmentLeaves']);
-        Route::put('/leave/approve/{id}', [LeaveController::class, 'approveLeave']);
-        Route::put('/leave/reject/{id}', [LeaveController::class, 'rejectLeave']);
+        
+        Route::patch('/head/leaves/approve/{id}', [LeaveController::class, 'approveLeave']);
+        Route::patch('/head/leaves/reject/{id}', [LeaveController::class, 'rejectLeave']);
+
+        Route::get('/projects/statistics', [ProjectController::class, 'getProjectStatistics']);
+        Route::get('/tasks/statistics', [TaskController::class, 'getTaskStatistics']);
+
     });
 
     Route::middleware('role:1,2')->group(function () {
@@ -51,9 +56,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::delete('/tasks/delete/{id}', [TaskController::class, 'deleteTask']);
         Route::patch('/tasks/edit', [TaskController::class, 'updateTask']);
-        Route::get('/tasks/{id}', [TaskController::class, 'getTask']);
+       
         Route::get('/leader/projects', [ProjectController::class, 'getTeamLeaderProjects']);
         Route::get('/project/employees/{project_id}', [ProjectController::class, 'getAssociatedEmployees']);
+        
+        Route::get('/department/leaves', [LeaveController::class, 'showLeaves']);
     });
 
     Route::get('/project/tasks/{project_id}', [TaskController::class, 'getTasks']);
@@ -61,7 +68,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("/employee/projects", [ProjectController::class, 'getProjectsByEmployee']);
 
     Route::get("/mytasks/{project_id}",[TaskController::class,'toDoTasks']);
+    Route::get('/tasks/{id}', [TaskController::class, 'getTask']);
     Route::put('/tasks/status/{id}', [TaskController::class, 'toggleStatus']);
-    Route::post('/leave/apply', [LeaveController::class, 'applyLeave']);
-    Route::get('/leave/my', [LeaveController::class, 'showMyLeaves']);
+    Route::get('/completed/tasks/{id}', [TaskController::class, 'getCompletedTasks']);
+    
+    Route::get('/employee/leaves', [LeaveController::class, 'showMyLeaves']);
+    Route::post('/employee/leaves/apply', [LeaveController::class, 'applyLeave']);
+    
+    Route::get('/employee/task/statistics',[TaskController::class,'getPersonalTaskStatistics']);
+    Route::patch('/update/user',[UserController::class,'updateOwnDetails']);
+  
+  
 });

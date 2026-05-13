@@ -23,7 +23,10 @@ import MyTaskView from "./MyTaskView";
 import UserProject from "./UserProject";
 import UserDashboard from "./UserDashboard";
 import Leave from "./Leave";
-import LeaveHead from "./department head/LeaveHead";
+import MyCompletedTasks from "./MyCompletedTasks";
+import MyDetail from "./MyDetail";
+import ChangePassword from "./ChangePassword";
+import ResetPassword from "./ResetPassword";
 
 
 function App() {
@@ -82,10 +85,7 @@ function App() {
               element: <CompletedProjects />,
 
             },
-            {
-              path:"/head/leaves",
-              element:<LeaveHead />
-            }
+         
           ],
         },
       ],
@@ -149,9 +149,25 @@ function App() {
         {
           path:"/leaves",
           element:<Leave/>
-        }
+        },
+        {
+          path:"/completed/tasks",
+          element:<MyCompletedTasks/>
+        },
+        {
+          path:"/myaccount",
+          element: <MyDetail/>
+        },
+        {
+          path:"/change-password",
+          element:<ChangePassword/>
+        },
       ]
     },
+    {
+          path:"/reset-password",
+          element:<ResetPassword/>
+        }
 
   ]);
 

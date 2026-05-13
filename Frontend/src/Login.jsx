@@ -3,11 +3,16 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "./api/auth.api";
 import { useUser } from "./context/UserContext";
+import { Link } from "react-router-dom";
+import { forgotPassword } from "./api/user.api";
 
 const Login = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { user, setUser } = useUser();
+  const [resetPassword, setResetPassword] = useState(false);
+  const [email, setEmail] = useState("");
+
 
   const {
     register,
@@ -42,35 +47,68 @@ const Login = () => {
       });
   }
 
+  function handleResetPassword(e){
+    e.preventDefault();
+      forgotPassword(email)
+      .then((response) => {
+        console.log(response.data.message);
+        alert("Password reset link sent to your email");
+      })
+      .catch((error) => {
+        console.log(error);
+        alert(error.response.data.message);
+      });
+  }
   return (
     <div>
-      <p>Log In</p>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <label>
-          Email
-          <input type="email" {...register("email", { required: true })} />
-        </label>
-        {errors.email && <p>{errors.email.message}</p>}
-        <label>
-          Password
+      {!resetPassword ? <>
+        <p>Log In</p>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <label>
+            Email
+            <input type="email" {...register("email", { required: true })} />
+          </label>
+          {errors.email && <p>{errors.email.message}</p>}
+          <label>
+            Password
+            <input
+              type="password"
+              {...register("password", {
+                required: true,
+              })}
+            />
+          </label>
+          <Link onClick={() => setResetPassword(true)}>Reset Password</Link>
+          {errors.password && <p>{errors.password.message}</p>}
           <input
-            type="password"
-            {...register("password", {
-              required: true,
-            })}
+            type="submit"
+            value={isSubmitting ? "Logging in..." : "Login"}
+            disabled={isSubmitting}
           />
-        </label>
-        {errors.password && <p>{errors.password.message}</p>}
-        <input
-          type="submit"
-          value={isSubmitting ? "Logging in..." : "Login"}
-          disabled={isSubmitting}
-        />
-        <p>
-          Dont have an account <a href="/signup">Sign up</a>
-        </p>
-      </form>
-      {error && <p>{error}</p>}
+          <p>
+            Dont have an account <a href="/signup">Sign up</a>
+          </p>
+        </form>
+        {error && <p>{error}</p>}
+      </> :
+
+        <>
+
+              <form>
+                <label>
+                  Enter Email
+                <input value={email} required onChange={(e) => setEmail(e.target.value)} type="text" />
+                </label>
+                <button type="submit" onClick={(e) => handleResetPassword(e)}>
+                  Send Link
+                </button>
+              </form>
+              <button onClick={() => setResetPassword(false)}>Back to Login</button>
+
+        </>
+
+      }
+
     </div>
   );
 };
