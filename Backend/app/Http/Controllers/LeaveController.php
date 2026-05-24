@@ -38,7 +38,7 @@ class LeaveController extends Controller
                 $query->where('department',Auth::user()->department);
             })
             ->orderBy('created_at','desc')
-            ->paginate(1);
+            ->paginate(3);
             if(!$leaves || $leaves->isEmpty()){
                 return response()->json([
                     "message"=>"Leaves not found"
@@ -52,7 +52,7 @@ class LeaveController extends Controller
         public function showMyLeaves(){
             $leaves = Leave::with('user')->where('user_id', Auth::id())
             ->orderBy('created_at','desc')
-            ->paginate(1);
+            ->paginate(4);
             if(!$leaves || $leaves->isEmpty()){
                 return response()->json([
                     "message"=>"Leaves not found"

@@ -81,55 +81,55 @@ const TaskList = () => {
   }
 
   useEffect(() => {
-    
+
     if (user?.role_id === 1) {
 
-  async function fetchAllProjects() {
-    try {
+      async function fetchAllProjects() {
+        try {
 
-      let allProjects = [];
-      let page = 1;
-      let lastPage = 1;
+          let allProjects = [];
+          let page = 1;
+          let lastPage = 1;
 
-      do {
-        const response = await showProjects(page);
+          do {
+            const response = await showProjects(page);
 
-        allProjects = [
-          ...allProjects,
-          ...response.data.projects.data
-        ];
+            allProjects = [
+              ...allProjects,
+              ...response.data.projects.data
+            ];
 
-        lastPage = response.data.projects.last_page;
+            lastPage = response.data.projects.last_page;
 
-        page++;
+            page++;
 
-      } while (page <= lastPage);
+          } while (page <= lastPage);
 
-      setProject(allProjects);
+          setProject(allProjects);
 
-      if (id) {
-        fetchTasks(id);
-      } else if (allProjects.length > 0) {
-        fetchTasks(allProjects[0].id);
-      }
+          if (id) {
+            fetchTasks(id);
+          } else if (allProjects.length > 0) {
+            fetchTasks(allProjects[0].id);
+          }
 
-    } catch (error) {
+        } catch (error) {
 
-      if (error.response) {
-        if (error.response.status == "404") {
-          console.log(error.response.data.message);
+          if (error.response) {
+            if (error.response.status == "404") {
+              console.log(error.response.data.message);
+            }
+          } else {
+            console.log(error);
+          }
+
         }
-      } else {
-        console.log(error);
       }
 
+      fetchAllProjects();
     }
-  }
 
-  fetchAllProjects();
-}
-
-     else if (user?.role_id === 2) {
+    else if (user?.role_id === 2) {
       getTeamLeaderProjects()
         .then((response) => {
           setProject(response.data.projects);
@@ -177,19 +177,20 @@ const TaskList = () => {
   }
 
   return (
-    <div>
-      {project?.length === 0 ? (
-        <p>No Projects Available</p>
-      ) : (
-        <>
-          {past ? (
-            <></>
-          ) : (
+    <div className="space-y-8">
+      {/* Project Selection & Action Bar */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Project Tasks</h1>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Viewing tasks for the selected project</p>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {project?.length > 0 && !past && (
             <select
               defaultValue={id ? id : project[0].id}
-              onChange={(e) => {
-                fetchTasks(e.target.value);
-              }}
+              onChange={(e) => fetchTasks(e.target.value)}
+              className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
             >
               {project.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -198,71 +199,102 @@ const TaskList = () => {
               ))}
             </select>
           )}
-        </>
-      )}
 
-      <h2>Tasks</h2>
+          <button
+            onClick={() => navigate(`/tasks/create/?project_id=${currentProject}`)}
+            className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all"
+          >
+            + Add New Task
+          </button>
+        </div>
+      </div>
 
-      <div>
+      {/* Tasks Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[300px]">
         {task?.length === 0 ? (
-          <p>No Tasks Available</p>
+          <div className="col-span-full py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400">
+            <p className="font-medium">No Tasks Available</p>
+          </div>
         ) : (
           task.map((t) => (
-            <div key={t.id}>
-              <h3> Title: {t.title}</h3>
-              <p> Description: {t.description}</p>
-              <p> Status: {t.status}</p>
-              <p> Priority: {t.priority}</p>
-              <p> Due Date: {t.due_date}</p>
-              <p>Assigned To: {t.user?.name || "Not Assigned"}</p>
+            <div
+              key={t.id}
+              className={`bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between transition-all hover:shadow-md border-t-8 ${t.priority === 'High' ? 'border-t-red-500' :
+                  t.priority === 'Medium' ? 'border-t-amber-400' : 'border-t-blue-500'
+                }`}
+            >
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-bold text-slate-800 leading-tight">{t.title}</h3>
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-tighter ${t.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-50 text-blue-600'
+                    }`}>
+                    {t.status}
+                  </span>
+                </div>
 
-              <button onClick={() => handleEdit(t.id)}>Edit</button>
+                <p className="text-gray-500 text-xs mb-6 line-clamp-2">{t.description}</p>
 
-              <button onClick={() => handleDelete(t.id)}>
-                Delete
-              </button>
+                <div className="space-y-3 mb-8">
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-gray-400 font-bold uppercase tracking-widest">Assigned To</span>
+                    <span className="text-slate-700 font-black">{t.user?.name || "Not Assigned"}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-gray-400 font-bold uppercase tracking-widest">Due Date</span>
+                    <span className="text-red-500 font-black">{t.due_date}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-50">
+                <button
+                  onClick={() => handleEdit(t.id)}
+                  className="text-indigo-600 font-bold text-xs py-2 rounded-lg hover:bg-indigo-50 transition-colors"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(t.id)}
+                  className="text-gray-300 font-bold text-xs py-2 rounded-lg hover:text-red-500 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))
         )}
       </div>
 
-      <button
-        disabled={current_page === 1}
-        onClick={handlePrev}
-      >
-        Prev
-      </button>
+      {/* Pagination */}
+      <div className="flex justify-center items-center space-x-2 pt-10">
+        <button
+          disabled={current_page === 1}
+          onClick={handlePrev}
+          className="p-2 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 disabled:opacity-50"
+        >
+          &larr;
+        </button>
 
-      {pages != null &&
-        Object.values(pages).map(
-          (p) =>
-            p != 0 && (
-              <button
-                key={p}
-                onClick={() => fetchTasks(currentProject, p)}
-              >
-                {p}
-              </button>
-            )
-        )}
+        {pages != null &&
+          Object.values(pages).map((p) => p != 0 && (
+            <button
+              key={p}
+              onClick={() => fetchTasks(currentProject, p)}
+              className={`w-10 h-10 rounded-lg font-bold text-sm transition-all ${current_page === p ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" : "text-slate-500 hover:bg-gray-100"
+                }`}
+            >
+              {p}
+            </button>
+          ))}
 
-      <button
-        disabled={current_page === last_page}
-        onClick={handleNext}
-      >
-        Next
-      </button>
-
-      <br />
-      <br />
-
-      <button
-        onClick={() =>
-          navigate(`/tasks/create/?project_id=${currentProject}`)
-        }
-      >
-        Add New Task
-      </button>
+        <button
+          disabled={current_page === last_page}
+          onClick={handleNext}
+          className="p-2 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 disabled:opacity-50"
+        >
+          &rarr;
+        </button>
+      </div>
     </div>
   );
 };

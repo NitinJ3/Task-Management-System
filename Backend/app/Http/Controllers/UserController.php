@@ -18,6 +18,14 @@ class UserController extends Controller
 
     public function registerUser(Request $request)
     {
+        $department = User::where('department',$request->department)->first();
+
+            if($department){
+                return response()->json([
+                    "message" => "Department already exists, please choose a different department"
+                ], 400);
+            }
+
 
         if($request->registered_role == 1) {
             // Handle department head registration
@@ -39,6 +47,9 @@ class UserController extends Controller
            
         else if($request->registered_role == 2) {
             // Handle employee registration
+
+            
+
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
@@ -70,11 +81,11 @@ class UserController extends Controller
 
  public function createCode()
 {
-    if (!Auth::check()) {
-        return response()->json([
-            'error' => 'User not logged in'
-        ], 401);
-    }
+    // if (!Auth::check()) {
+    //     return response()->json([
+    //         'error' => 'User not logged in'
+    //     ], 401);
+    // }
 
     $user_id = Auth::user()->id;
     $column = Registration::where('user_id',$user_id)->delete();
@@ -156,7 +167,7 @@ class UserController extends Controller
    public function getDepartmentEmployees(Request $request)
 {
     $search = $request->query("search");
-
+    
     $employees = User::with("role")
         ->where("department", Auth::user()->department)
         ->where("role_id", "!=", 1)

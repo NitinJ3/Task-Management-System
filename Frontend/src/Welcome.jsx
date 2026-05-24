@@ -89,15 +89,15 @@ const Welcome = () => {
       </section>
 
       {/* --- Workflow Section (How it works) --- */}
-      <section id="workflow" className="py-24 px-4">
-        <div className="max-w-5xl mx-auto bg-indigo-900 rounded-3xl p-12 text-white shadow-2xl">
+      <section id="workflow" className="py-24 px-4 ">
+        <div className="max-w-5xl mx-auto bg-indigo-900 rounded-3xl p-12 text-white shadow-2xl ">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold mb-6">Simplified Workflow</h2>
               <ul className="space-y-4">
                 <li className="flex items-center gap-3">
                   <CheckCircle size={20} className="text-indigo-400" />
-                  <span>Register your Department with a unique code</span>
+                  <span>Register your Department</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <CheckCircle size={20} className="text-indigo-400" />
@@ -113,14 +113,14 @@ const Welcome = () => {
                 </li>
               </ul>
             </div>
-            <div className="bg-indigo-800/50 p-8 rounded-2xl border border-indigo-700">
+            {/* <div className="bg-indigo-800/50 p-8 rounded-2xl border border-indigo-700">
               <div className="text-sm font-mono text-indigo-300 mb-2">// System Stats</div>
               <div className="text-4xl font-bold">100%</div>
               <p className="text-indigo-200 text-sm mt-1">Real-time Task Visibility</p>
               <div className="mt-6 h-2 bg-indigo-700 rounded-full">
                 <div className="h-full w-3/4 bg-white rounded-full"></div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>

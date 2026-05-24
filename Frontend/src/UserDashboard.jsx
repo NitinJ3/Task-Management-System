@@ -37,21 +37,60 @@ const UserDashboard = () => {
 
 
 
-  return (
-    <div>
-      User Dashboard
-      <div>
-        <h3>Projects Assigned</h3>
-        <p>{projectCount}</p>
+ return (
+    <div className="space-y-10 animate-in fade-in duration-500">
+      {/* Page Title */}
+      <h1 className="text-2xl font-black text-slate-800 tracking-tight">
+        User Dashboard
+      </h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
+        {/* Projects Assigned Card */}
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-indigo-600"></div>
+          
+          <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-4">
+            Projects Assigned
+          </h3>
+          
+          <div className="flex items-baseline space-x-2">
+            <p className="text-5xl font-black text-slate-800 leading-none">
+              {projectCount}
+            </p>
+            <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">
+              Active
+            </span>
+          </div>
+        </div>
+
+        {/* Personal Tasks Progress Card */}
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-green-500"></div>
+          
+          <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-4">
+            Personal Tasks Completed
+          </h3>
+          
+          <div className="flex items-baseline space-x-2">
+            <p className="text-5xl font-black text-slate-800 leading-none">
+              {taskstats.completed}
+            </p>
+            <p className="text-2xl font-bold text-gray-300">
+              / {taskstats.total}
+            </p>
+          </div>
+          
+          {/* Progress Bar Visual */}
+          <div className="mt-6 w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+            <div 
+              className="bg-green-500 h-full transition-all duration-1000 ease-out"
+              style={{ width: `${taskstats.total > 0 ? (taskstats.completed / taskstats.total) * 100 : 0}%` }}
+            ></div>
+          </div>
+        </div>
       </div>
-      
-      <div>
-        <h3>Personal Tasks Completed</h3>
-        <p>{taskstats.completed}/{taskstats.total}</p>
-      </div>
-      
     </div>
-  )
+  );
 }
 
 export default UserDashboard

@@ -57,15 +57,22 @@ const ResetPassword = () => {
   };
 
   return (
-    <div>
-        <h1>Reset Password</h1>
-      <form onSubmit={handleSubmit}>
+  <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+
+    <div className="w-full max-w-sm bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+
+      <h1 className="text-xl font-bold text-gray-800 mb-6 text-center">
+        Reset Password
+      </h1>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
 
         <input
           type="password"
           placeholder="New Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-400"
         />
 
         <input
@@ -73,15 +80,22 @@ const ResetPassword = () => {
           placeholder="Confirm New Password"
           value={passwordConfirmation}
           onChange={(e) => setPasswordConfirmation(e.target.value)}
+          className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-400"
         />
 
-        <button type="submit">
+        <button
+          type="submit"
+          className="w-full bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition"
+        >
           Reset Password
         </button>
 
       </form>
+
     </div>
-  )
+
+  </div>
+);
 }
 
 export default ResetPassword

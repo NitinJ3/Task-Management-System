@@ -94,7 +94,7 @@ class TaskController extends Controller
             return $response;
         }
 
-        $tasks = Task::with('user')->where('project_id', $project_id)->paginate(5);
+        $tasks = Task::with('user')->where('project_id', $project_id)->paginate(3);
 
 
         if ($tasks->isEmpty()) {
@@ -299,10 +299,15 @@ public function getCompletedTasks($id){
         ->where('status', 'completed')
         ->count();
 
+    $pending_tasks = $total_tasks
+        ->where('status', 'pending')
+        ->count();
+
     return response()->json([
         "total_tasks" => $total_tasks->count(),
         "non_completed_tasks" => $non_completed_tasks,
-        "completed_tasks" => $completed_tasks
+        "completed_tasks" => $completed_tasks,
+        "pending_tasks" => $pending_tasks
     ], 200);
 }
 

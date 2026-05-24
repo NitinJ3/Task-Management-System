@@ -32,7 +32,7 @@ class ProjectController extends Controller
 
       $projects = Project::where('department', Auth::user()->department)
                 ->where('status', '!=', 'completed')
-                ->paginate(1);
+                ->paginate(3);
 
         if (!$projects || $projects->isEmpty()) {
             return response()->json([
@@ -170,6 +170,9 @@ class ProjectController extends Controller
                 "message" => "sorry no such project found"
             ], 404);
         }
+
+        
+
         $project->delete();
         return response()->json([
             "message" => "Project deleted successfully"

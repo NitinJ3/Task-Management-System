@@ -27,6 +27,7 @@ import MyCompletedTasks from "./MyCompletedTasks";
 import MyDetail from "./MyDetail";
 import ChangePassword from "./ChangePassword";
 import ResetPassword from "./ResetPassword";
+import NotFound from "./NotFound";
 
 
 function App() {
@@ -164,9 +165,13 @@ function App() {
         },
       ]
     },
-    {
+        {
           path:"/reset-password",
           element:<ResetPassword/>
+        },
+        {
+          path: "*",
+          element: <NotFound />
         }
 
   ]);
